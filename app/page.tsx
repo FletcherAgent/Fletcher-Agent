@@ -1,21 +1,48 @@
+"use client";
+
+import { useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
 import Hero from "./components/sections/Hero";
-import Marquee from "./components/ui/Marquee";
-import Pipeline from "./components/sections/Pipeline";
-import Layers from "./components/sections/Layers";
-import Features from "./components/sections/Features";
+import Architecture from "./components/sections/Architecture";
+import Belief from "./components/sections/Belief";
+import Agents from "./components/sections/Agents";
+import Mind from "./components/sections/Mind";
+import Safety from "./components/sections/Safety";
+import Cta from "./components/sections/Cta";
+import Footer from "./components/layout/Footer";
 
 export default function Home() {
+  // Global Reveal Observer
+  useEffect(() => {
+    const ioReveal = new IntersectionObserver(
+      (es) => {
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            ioReveal.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => ioReveal.observe(el));
+
+    return () => {
+      ioReveal.disconnect();
+    };
+  }, []);
+
   return (
-    <div id="landing-view">
+    <>
       <Navbar />
       <Hero />
-      <Marquee />
-      <Pipeline />
-      <Layers />
-      <Features />
+      <Architecture />
+      <Belief />
+      <Agents />
+      <Mind />
+      <Safety />
+      <Cta />
       <Footer />
-    </div>
+    </>
   );
 }

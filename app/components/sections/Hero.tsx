@@ -1,144 +1,242 @@
 "use client";
-import { useEffect, useRef } from "react";
+
+import { useEffect } from "react";
 
 export default function Hero() {
-  const svgRef = useRef<SVGSVGElement>(null);
-
+  // Hero Canvas (Binfield)
   useEffect(() => {
-    if (!svgRef.current) return;
-    
-    // Dynamic import to avoid SSR issues
-    import("d3").then((d3) => {
-      const svg = d3.select(svgRef.current);
-      svg.selectAll("*").remove(); // Clear previous render on hot reload
+    const canvas = document.getElementById("binfield") as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let W = 0,
+      H = 0,
+      cx = 0,
+      cy = 0,
+      scale = 0;
+    const isSmall = Math.min(screen.width, screen.height) < 760;
+    const N = isSmall ? 4200 : 8000;
+    const P = new Array(N);
+    const FOV = 2.6;
 
-      function resize() {
-        const parent = svgRef.current?.parentElement;
-        const W = parent?.clientWidth || window.innerWidth;
-        const H = parent?.clientHeight || 600;
-        svg.attr("width", W).attr("height", H);
-        return { W, H };
-      }
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.clientWidth;
+      H = canvas.clientHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = W * 0.52;
+      cy = H * 0.42;
+      scale = Math.min(W, H) * 0.55;
+      ctx!.fillStyle = "#000";
+      ctx!.fillRect(0, 0, W, H);
+    }
+    resize();
+    window.addEventListener("resize", resize);
 
-      let { W, H } = resize();
-      const opacityFactor = 1;
-      const palette = ["#39FF14", "#00FF41", "#00FF00", "#32CD32", "#7CFC00", "#ADFF2F", "#FFFFFF"];
-      const nodes = Array.from({ length: 22 }, (_, i) => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.32,
-        vy: (Math.random() - 0.5) * 0.32,
-        r: 2 + Math.random() * 4,
-        color: palette[i % palette.length],
-        p: Math.random() * Math.PI * 2,
-      }));
+    function gauss() {
+      return (Math.random() + Math.random() + Math.random() + Math.random() - 2) / 2;
+    }
 
-      const gL = svg.append("g");
-      const gD = svg.append("g");
-      const MAX = 190;
-      let animationFrameId: number;
+    for (let i = 0; i < N; i++) {
+      const ring = Math.random();
+      let r;
+      if (ring < 0.48) r = 0.18 + Math.abs(gauss()) * 0.3;
+      else if (ring < 0.86) r = 0.3 + Math.random() * 0.78;
+      else r = 0.95 + Math.random() * 0.5;
+      P[i] = {
+        r: r,
+        th: Math.random() * Math.PI * 2,
+        h: gauss() * 0.05 * (0.4 + r),
+        sp: (0.0024 / (r + 0.1)) * (0.8 + Math.random() * 0.4),
+        g: Math.random() < 0.14,
+        tw: Math.random() * Math.PI * 2,
+        arm: Math.random() < 0.5 ? 1 : -1,
+      };
+    }
 
-      function step() {
-        nodes.forEach((n) => {
-          n.x += n.vx;
-          n.y += n.vy;
-          n.p += 0.016;
-          if (n.x < -20 || n.x > W + 20) n.vx *= -1;
-          if (n.y < -20 || n.y > H + 20) n.vy *= -1;
-        });
+    const ptr = { x: -9999, y: -9999, s: 0 };
+    function setPtr(e: any) {
+      const t = e.touches ? e.touches[0] : e;
+      const rect = canvas.getBoundingClientRect();
+      ptr.x = t.clientX - rect.left;
+      ptr.y = t.clientY - rect.top;
+      ptr.s = 1;
+    }
+    window.addEventListener("pointermove", setPtr, { passive: true });
+    window.addEventListener("touchmove", setPtr, { passive: true });
+    window.addEventListener("pointerleave", () => {
+      ptr.s = 0;
+    });
 
-        const edges = [];
-        for (let i = 0; i < nodes.length; i++) {
-          for (let j = i + 1; j < nodes.length; j++) {
-            const dx = nodes[j].x - nodes[i].x;
-            const dy = nodes[j].y - nodes[i].y;
-            const d = Math.sqrt(dx * dx + dy * dy);
-            if (d < MAX) edges.push({ s: nodes[i], t: nodes[j], d });
+    let t = 0;
+    let reqId: number;
+    function frame() {
+      t++;
+      ctx!.fillStyle = "rgba(0,0,0,0.30)";
+      ctx!.fillRect(0, 0, W, H);
+
+      const tiltX = 1.1 + 0.38 * Math.sin(t * 0.0021);
+      const rollZ = 0.34 * Math.sin(t * 0.0013 + 1.7);
+      const cosX = Math.cos(tiltX),
+        sinX = Math.sin(tiltX);
+      const cosZ = Math.cos(rollZ),
+        sinZ = Math.sin(rollZ);
+      const swirl = 2.4 + 0.9 * Math.sin(t * 0.0009);
+
+      for (let i = 0; i < N; i++) {
+        const p = P[i];
+        if (!reduced) p.th += p.sp;
+        const a = p.th + p.arm * swirl * Math.log(p.r + 0.6);
+
+        const x = Math.cos(a) * p.r;
+        const z = Math.sin(a) * p.r;
+        const y = p.h;
+        const y1 = y * cosX - z * sinX;
+        const z1 = y * sinX + z * cosX;
+        const x2 = x * cosZ - y1 * sinZ;
+        const y2 = x * sinZ + y1 * cosZ;
+        const per = FOV / (FOV + z1);
+        let sx = cx + x2 * scale * per;
+        let sy = cy + y2 * scale * per;
+
+        const dx = (sx - cx + scale * 0.02) / (scale * 0.085),
+          dy = (sy - cy) / (scale * 0.075);
+        if (dx * dx + dy * dy < 1) continue;
+
+        if (ptr.s) {
+          const mx = sx - ptr.x,
+            my = sy - ptr.y,
+            d2 = mx * mx + my * my;
+          if (d2 < 16900) {
+            const d = Math.sqrt(d2) || 1,
+              f = ((130 - d) / 130) * 30;
+            sx += (mx / d) * f;
+            sy += (my / d) * f;
           }
         }
 
-        const lines = gL.selectAll("line").data(edges);
-        lines
-          .enter()
-          .append("line")
-          .merge(lines as any)
-          .attr("x1", (e) => e.s.x)
-          .attr("y1", (e) => e.s.y)
-          .attr("x2", (e) => e.t.x)
-          .attr("y2", (e) => e.t.y)
-          .attr("stroke", (e) => e.s.color)
-          .attr("stroke-width", 0.7)
-          .attr("opacity", (e) => (1 - e.d / MAX) * opacityFactor * 0.5);
-        lines.exit().remove();
+        let b = Math.max(0, 1 - (p.r - 0.18) * 0.95);
+        b = b * b;
+        b *= 0.55 + 0.45 * per * per;
+        if (!reduced) b *= 0.7 + 0.3 * Math.sin(p.tw + t * 0.03);
+        b = Math.min(1, b + 0.05);
 
-        const circles = gD.selectAll("circle").data(nodes);
-        circles
-          .enter()
-          .append("circle")
-          .merge(circles as any)
-          .attr("cx", (n) => n.x)
-          .attr("cy", (n) => n.y)
-          .attr("r", (n) => n.r + Math.sin(n.p) * 0.8)
-          .attr("fill", (n) => n.color)
-          .attr("opacity", (n) => opacityFactor * (0.45 + Math.sin(n.p) * 0.18));
-        circles.exit().remove();
-
-        animationFrameId = requestAnimationFrame(step);
+        const s = p.r < 0.4 ? 1.5 : 1;
+        if (p.g) {
+          ctx!.fillStyle = "rgba(43,255,91," + (b * 0.85).toFixed(3) + ")";
+        } else {
+          const w = 210 + Math.floor(45 * b);
+          ctx!.fillStyle = "rgba(" + w + "," + w + "," + w + "," + b.toFixed(3) + ")";
+        }
+        ctx!.fillRect(sx, sy, s, s);
       }
 
-      animationFrameId = requestAnimationFrame(step);
+      const g1 = ctx!.createRadialGradient(cx, cy, scale * 0.05, cx, cy, scale * 0.26);
+      g1.addColorStop(0, "rgba(255,255,255,0.20)");
+      g1.addColorStop(0.45, "rgba(255,255,255,0.05)");
+      g1.addColorStop(1, "rgba(255,255,255,0)");
+      ctx!.fillStyle = g1;
+      ctx!.beginPath();
+      ctx!.arc(cx, cy, scale * 0.26, 0, Math.PI * 2);
+      ctx!.fill();
 
-      window.addEventListener("resize", () => {
-        const dims = resize();
-        W = dims.W;
-        H = dims.H;
-      });
+      const gx = cx + Math.sin(t * 0.004) * scale * 0.1;
+      const g2 = ctx!.createRadialGradient(gx, cy, 0, gx, cy, scale * 0.5);
+      g2.addColorStop(0, "rgba(43,255,91,0.030)");
+      g2.addColorStop(1, "rgba(43,255,91,0)");
+      ctx!.fillStyle = g2;
+      ctx!.beginPath();
+      ctx!.arc(gx, cy, scale * 0.5, 0, Math.PI * 2);
+      ctx!.fill();
 
-      return () => {
-        cancelAnimationFrame(animationFrameId);
-        window.removeEventListener("resize", resize);
-      };
-    });
+      if (!reduced) reqId = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => {
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", setPtr);
+      window.removeEventListener("touchmove", setPtr);
+      cancelAnimationFrame(reqId);
+    };
+  }, []);
+
+  // Observers for counters
+  useEffect(() => {
+    const CH = "abcdefXYZLPx!%^(#01";
+    const els = document.querySelectorAll("[data-count]");
+    const ioCounters = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e: any) => {
+          if (!e.isIntersecting || e.target.dataset.done) return;
+          e.target.dataset.done = "1";
+          const target = parseFloat(e.target.dataset.count);
+          const dec = e.target.dataset.format === "dec";
+          const final = dec ? target.toFixed(1) : Math.round(target).toLocaleString("en-US");
+          const t0 = performance.now(),
+            scr = 900,
+            dur = 2600;
+          (function tick(now) {
+            const el = now - t0;
+            if (el < scr) {
+              const lock = Math.floor(final.length * (el / scr));
+              let s = "";
+              for (let i = 0; i < final.length; i++) {
+                s += i < lock ? final[i] : CH[(Math.random() * CH.length) | 0];
+              }
+              e.target.textContent = s;
+              requestAnimationFrame(tick);
+            } else {
+              const k = Math.min(1, (el - scr) / (dur - scr));
+              const v = target * (1 - Math.pow(1 - k, 3));
+              e.target.textContent = dec ? v.toFixed(1) : Math.round(v).toLocaleString("en-US");
+              if (k < 1) requestAnimationFrame(tick);
+            }
+          })(t0);
+        });
+      },
+      { threshold: 0.4 }
+    );
+    els.forEach((el) => ioCounters.observe(el));
+    return () => ioCounters.disconnect();
   }, []);
 
   return (
-    <section id="hero">
-      <svg id="hero-canvas" ref={svgRef}></svg>
-      <div className="hero-inner">
-        <div className="hero-tag">Core Alpha</div>
-        <h1 className="hero-h1">
-          The<br />
-          <span>Fletcher</span><br />
-          Agent
-        </h1>
-        <p className="hero-sub">
-          The first fully autonomous AI agent acting as an active range manager on Uniswap V3 and executing strategies on Robinhood Chain 24/7. Event-listener based, zero custody.
-        </p>
-        <div className="hero-actions">
-          <button className="btn-neon" onClick={() => alert("Platform coming soon")}>
-            ⚡ View Live Network
-          </button>
-          <a href="#config" className="btn-ghost">Read Documentation</a>
+    <div className="hero">
+      <canvas id="binfield"></canvas>
+
+      <div className="hero-stats">
+        <div>
+          <div className="stat-label">Tokens Sniped</div>
+          <div className="stat-value" data-count="3204" data-format="int">
+            0
+          </div>
         </div>
-        <div className="hero-meta">
-          <div className="hero-stat">
-            <div className="hs-n">19</div>
-            <div className="hs-l">Agents</div>
+        <div>
+          <div className="stat-label">Pools Managed</div>
+          <div className="stat-value" data-count="1485" data-format="int">
+            0
           </div>
-          <div className="hero-stat">
-            <div className="hs-n">6</div>
-            <div className="hs-l">Layers</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hs-n">100<span>ms</span></div>
-            <div className="hs-l">Execution</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hs-n">EVM</div>
-            <div className="hs-l">Native</div>
+        </div>
+        <div>
+          <div className="stat-label">Simulated Profit</div>
+          <div className="stat-value">
+            $<span data-count="84920" data-format="dec">0</span>
           </div>
         </div>
       </div>
-    </section>
+
+      <div className="hero-copy">
+        <h1>Autonomous sniping & LP management on Robinhood Chain</h1>
+        <p className="hero-sub">
+          A specialized swarm of five agents executing sub-second trades and protecting liquidity positions.
+          Fletcher monitors Nexa Fun, calculates impermanent loss, and rebalances ticks in real time.
+        </p>
+      </div>
+
+      <div className="scroll-cue">⌄</div>
+    </div>
   );
 }
