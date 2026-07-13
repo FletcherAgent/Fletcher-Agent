@@ -1,7 +1,7 @@
 export default function Navbar() {
   return (
     <header>
-      <a className="logo" href="#">
+      <a className="logo" href="/">
         <svg viewBox="0 0 40 40" fill="none" stroke="#f2f2f2" strokeWidth="1.6">
           <line x1="20" y1="2" x2="20" y2="14" />
           <line x1="20" y1="26" x2="20" y2="38" />
@@ -20,14 +20,14 @@ export default function Navbar() {
         </span>
       </a>
       <nav>
-        <a href="#architecture">Architecture</a>
-        <a href="#agents">Agents</a>
-        <a href="#mind">Swarm Mind</a>
-        <a href="#safety">Risk Protocol</a>
-        <a href="#roadmap">Roadmap</a>
+        <a href="/#architecture">Architecture</a>
+        <a href="/#agents">Agents</a>
+        <a href="/#mind">Swarm Mind</a>
+        <a href="/#safety">Risk Protocol</a>
+        <a href="/#roadmap">Roadmap</a>
       </nav>
       <div className="header-right">
-        <button className="btn-app">Open Telegram Bot</button>
+        <a href="/dashboard" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
         <button className="burger" aria-label="Menu">
           <span></span>
           <span></span>
