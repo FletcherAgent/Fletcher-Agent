@@ -3,7 +3,7 @@ export default function Agents() {
     <section id="agents">
       <div className="wrap">
         <div className="eyebrow reveal">Agent Mesh</div>
-        <h2 className="reveal">Five agents. One unified intelligence.</h2>
+        <h2 className="reveal">Six agents. One unified intelligence.</h2>
 
         <div className="agents">
           <div className="agent reveal">
@@ -12,7 +12,7 @@ export default function Agents() {
               <h3>
                 Orchestrator<span className="dot">_</span>
               </h3>
-              <p>The central brain. Dispatches tasks to sub-agents and handles lifecycle.</p>
+              <p>The central nervous system. Routes signals between agents and manages Telegram notifications.</p>
             </div>
           </div>
           <div className="agent reveal">
@@ -21,34 +21,43 @@ export default function Agents() {
               <h3>
                 Scout<span className="dot">_</span>
               </h3>
-              <p>Listens to Blockscout and on-chain RPCs for new tokens and pools.</p>
+              <p>Connects via WebSockets to detect TokenCreated events natively on the NOXA Factory.</p>
             </div>
           </div>
           <div className="agent reveal">
             <span className="agent-id">AGT_03</span>
             <div>
               <h3>
-                Trader<span className="dot">_</span>
+                Tracker<span className="dot">_</span>
               </h3>
-              <p>Interacts with the user via Telegram and executes buy/sell logic.</p>
+              <p>Intercepts Alchemy Webhooks to mirror high-conviction trades from targeted Alpha Wallets.</p>
             </div>
           </div>
           <div className="agent reveal">
             <span className="agent-id">AGT_04</span>
             <div>
               <h3>
-                Guardian<span className="dot">_</span>
+                Trader<span className="dot">_</span>
               </h3>
-              <p>Analyzes token contracts for honeypots, mint privileges, and rug risks.</p>
+              <p>Executes swap transactions instantly via Uniswap V3 Quoter & Router on Robinhood Chain.</p>
             </div>
           </div>
-          <div className="agent reveal" style={{ gridColumn: "1 / -1" }}>
+          <div className="agent reveal">
             <span className="agent-id">AGT_05</span>
             <div>
               <h3>
-                LP Manager<span className="dot">_</span>
+                Guardian<span className="dot">_</span>
               </h3>
-              <p>Manages Uniswap V3 positions, auto-compounds, and rebalances volatility bands.</p>
+              <p>Monitors active positions in real-time, executing dynamic trailing stop-losses to secure profits.</p>
+            </div>
+          </div>
+          <div className="agent reveal">
+            <span className="agent-id">AGT_06</span>
+            <div>
+              <h3>
+                Risk Warden<span className="dot">_</span>
+              </h3>
+              <p>The gatekeeper. Enforces maximum portfolio heat caps and a strict 15% daily drawdown limit.</p>
             </div>
           </div>
         </div>

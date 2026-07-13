@@ -215,13 +215,13 @@ export default function Hero() {
           </div>
         </div>
         <div>
-          <div className="stat-label">Pools Managed</div>
+          <div className="stat-label">Alpha Wallets Tracked</div>
           <div className="stat-value" data-count="1485" data-format="int">
             0
           </div>
         </div>
         <div>
-          <div className="stat-label">Simulated Profit</div>
+          <div className="stat-label">Realized Profit</div>
           <div className="stat-value">
             $<span data-count="84920" data-format="dec">0</span>
           </div>
@@ -229,10 +229,10 @@ export default function Hero() {
       </div>
 
       <div className="hero-copy">
-        <h1>Autonomous sniping & LP management on Robinhood Chain</h1>
+        <h1>Autonomous sniping & copy-trading on Robinhood Chain</h1>
         <p className="hero-sub">
-          A specialized swarm of five agents executing sub-second trades and protecting liquidity positions.
-          Fletcher monitors Nexa Fun, calculates impermanent loss, and rebalances ticks in real time.
+          A specialized swarm of six agents executing sub-second trades and protecting capital.
+          Fletcher monitors NOXA Token launches, mirrors Alpha wallets, and enforces strict risk parameters.
         </p>
       </div>
 

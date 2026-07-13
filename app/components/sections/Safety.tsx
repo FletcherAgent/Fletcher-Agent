@@ -12,15 +12,15 @@ export default function Safety() {
               <span className="v-true">CONFIRM</span>
             </div>
             <div className="row">
-              <span className="k">AUTO_COMPOUND</span>
-              <span className="v-true">TRUE</span>
+              <span className="k">DAILY_DRAWDOWN</span>
+              <span className="v-true">15% MAX</span>
             </div>
             <div className="row">
-              <span className="k">DYNAMIC_REBALANCE</span>
-              <span className="v-true">TRUE</span>
+              <span className="k">PORTFOLIO_HEAT</span>
+              <span className="v-true">5 ACTIVE</span>
             </div>
             <div className="row">
-              <span className="k">HONEYPOT_CHECK</span>
+              <span className="k">TRAILING_STOP</span>
               <span className="v-true">TRUE</span>
             </div>
             <div className="row">
@@ -35,8 +35,8 @@ export default function Safety() {
           <ul className="safety-list reveal">
             <li>Every snipe sends a Telegram push notification with Confirm / Reject buttons.</li>
             <li>Unconfirmed snipes expire automatically after 5 minutes to prevent stale execution.</li>
-            <li>Guardian Agent verifies contract source via Blockscout API before passing the signal.</li>
-            <li>Impermanent Loss logic calculates HODL parity and auto-adjusts Uniswap V3 tick ranges.</li>
+            <li>Risk Warden continuously calculates daily PnL and strictly enforces a 15% maximum drawdown.</li>
+            <li>Guardian Protocol locks in profits with dynamic trailing stop-losses on all open positions.</li>
           </ul>
         </div>
       </div>

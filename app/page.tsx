@@ -8,6 +8,7 @@ import Belief from "./components/sections/Belief";
 import Agents from "./components/sections/Agents";
 import Mind from "./components/sections/Mind";
 import Safety from "./components/sections/Safety";
+import Roadmap from "./components/sections/Roadmap";
 import Cta from "./components/sections/Cta";
 import Footer from "./components/layout/Footer";
 
@@ -15,8 +16,8 @@ export default function Home() {
   // Global Reveal Observer
   useEffect(() => {
     const ioReveal = new IntersectionObserver(
-      (es) => {
-        es.forEach((e) => {
+      (entries) => {
+        entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("in");
             ioReveal.unobserve(e.target);
@@ -41,6 +42,7 @@ export default function Home() {
       <Agents />
       <Mind />
       <Safety />
+      <Roadmap />
       <Cta />
       <Footer />
     </>
