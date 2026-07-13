@@ -100,7 +100,53 @@ export default async function Dashboard() {
               </div>
             </div>
 
-            <div className="dash-panel">
+            <div className="dash-panel" style={{ marginTop: '20px' }}>
+              <div className="panel-head">PnL History by Agent</div>
+              <div className="panel-body">
+                <table className="dash-table">
+                  <thead>
+                    <tr>
+                      <th>Token</th>
+                      <th>Agent (Source)</th>
+                      <th style={{textAlign:'right'}}>PnL (%)</th>
+                      <th style={{textAlign:'right'}}>Result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {positions.filter((p: any) => p.status === 'CLOSED').length === 0 ? (
+                      <tr><td colSpan={4} className="empty-state">No closed positions history.</td></tr>
+                    ) : (
+                      positions
+                        .filter((p: any) => p.status === 'CLOSED' && p.entryPrice && p.exitPrice)
+                        .map((p: any) => {
+                          const pnlRatio = p.pnl != null ? (p.pnl * 100) : (((p.exitPrice - p.entryPrice) / p.entryPrice) * 100);
+                          const isWin = pnlRatio > 0;
+                          return (
+                            <tr key={p.id}>
+                              <td>{p.tokenAddress.substring(0,6)}...{p.tokenAddress.substring(38)}</td>
+                              <td>
+                                <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
+                              </td>
+                              <td style={{textAlign:'right', color: isWin ? '#00e676' : '#ff3d00'}}>
+                                {pnlRatio > 0 ? '+' : ''}{pnlRatio.toFixed(2)}%
+                              </td>
+                              <td style={{textAlign:'right'}}>
+                                {isWin ? (
+                                  <span className="badge badge-pass">WIN</span>
+                                ) : (
+                                  <span className="badge badge-veto">LOSS</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="dash-panel" style={{ marginTop: '20px' }}>
               <div className="panel-head">Signal Feed</div>
               <div className="panel-body scroll-area h-96">
                 {signals.length === 0 ? (
