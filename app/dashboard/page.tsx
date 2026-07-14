@@ -156,29 +156,43 @@ export default async function Dashboard() {
                   <div className="empty-state">Awaiting incoming signals...</div>
                 ) : (
                   <div className="signal-list">
-                    {signals.map((s: any) => (
-                      <div key={s.id} className="signal-item">
-                        <div className="sig-left">
-                          <span className="sig-time">
-                            {new Date(s.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                          </span>
-                          <span className={`badge badge-${s.source.toLowerCase()}`}>{s.source}</span>
-                          <div className="sig-info">
-                            <span className="sig-token">{s.tokenAddress}</span>
-                            {s.copiedFrom && (
-                              <span className="sig-wallet">Wallet: {s.copiedFrom.substring(0, 8)}...</span>
+                    {signals.map((s: any) => {
+                      const sigType = s.rawContext?.type as string | undefined;
+                      const isBuy = sigType === 'BUY';
+                      const isSell = sigType === 'SELL';
+                      return (
+                        <div key={s.id} className="signal-item">
+                          <div className="sig-left">
+                            <span className="sig-time">
+                              {new Date(s.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                            </span>
+                            {/* BUY / SELL badge */}
+                            {isBuy && (
+                              <span className="badge" style={{ background: 'rgba(0,230,118,0.15)', color: '#00e676', border: '1px solid #00e67644' }}>🛒 BUY</span>
+                            )}
+                            {isSell && (
+                              <span className="badge" style={{ background: 'rgba(255,61,0,0.15)', color: '#ff6d3a', border: '1px solid #ff3d0044' }}>💥 SELL</span>
+                            )}
+                            {!isBuy && !isSell && (
+                              <span className={`badge badge-${s.source.toLowerCase()}`}>{s.source}</span>
+                            )}
+                            <div className="sig-info">
+                              <span className="sig-token">{s.tokenAddress}</span>
+                              {s.copiedFrom && (
+                                <span className="sig-wallet">Wallet: {s.copiedFrom.substring(0, 8)}...</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="sig-right">
+                            {s.passed ? (
+                              <span className="badge badge-pass">PASS</span>
+                            ) : (
+                              <span className="badge badge-veto">VETO</span>
                             )}
                           </div>
                         </div>
-                        <div className="sig-right">
-                          {s.passed ? (
-                            <span className="badge badge-pass">PASS</span>
-                          ) : (
-                            <span className="badge badge-veto">VETO</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
