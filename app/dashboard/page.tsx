@@ -1,12 +1,13 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import ClientTime from "../components/ClientTime";
+import AutoRefresh from "./AutoRefresh";
 
 export const dynamic = 'force-dynamic';
 
 export default async function Dashboard() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://fletcher-core-production.up.railway.app";
-  
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://fletcher-core-production-d4b8.up.railway.app";
+
   let wallets = [];
   let signals = [];
   let positions = [];
@@ -32,9 +33,10 @@ export default async function Dashboard() {
   return (
     <>
       <Navbar />
-      
+      <AutoRefresh interval={3000} />
+
       <main className="dashboard-main wrap">
-        
+
         <div className="dash-header">
           <div>
             <h1>System Dashboard</h1>
@@ -62,9 +64,9 @@ export default async function Dashboard() {
         </div>
 
         <div className="dash-grid">
-          
+
           <div className="dash-main-col">
-            
+
             <div className="dash-panel">
               <div className="panel-head">Active Positions</div>
               <div className="panel-body">
@@ -74,7 +76,7 @@ export default async function Dashboard() {
                       <th>Token</th>
                       <th>Source</th>
                       <th>Status</th>
-                      <th style={{textAlign:'right'}}>Size (ETH)</th>
+                      <th style={{ textAlign: 'right' }}>Size (ETH)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -83,7 +85,7 @@ export default async function Dashboard() {
                     ) : (
                       positions.map((p: any) => (
                         <tr key={p.id}>
-                          <td>{p.tokenAddress.substring(0,6)}...{p.tokenAddress.substring(38)}</td>
+                          <td>{p.tokenAddress.substring(0, 6)}...{p.tokenAddress.substring(38)}</td>
                           <td>
                             <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
                           </td>
@@ -96,7 +98,7 @@ export default async function Dashboard() {
                               )}
                             </div>
                           </td>
-                          <td style={{textAlign:'right'}}>{p.size.toFixed(4)}</td>
+                          <td style={{ textAlign: 'right' }}>{p.size.toFixed(4)}</td>
                         </tr>
                       ))
                     )}
@@ -113,8 +115,8 @@ export default async function Dashboard() {
                     <tr>
                       <th>Token</th>
                       <th>Agent (Source)</th>
-                      <th style={{textAlign:'right'}}>PnL (%)</th>
-                      <th style={{textAlign:'right'}}>Result</th>
+                      <th style={{ textAlign: 'right' }}>PnL (%)</th>
+                      <th style={{ textAlign: 'right' }}>Result</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -128,14 +130,14 @@ export default async function Dashboard() {
                           const isWin = pnlRatio > 0;
                           return (
                             <tr key={p.id}>
-                              <td>{p.tokenAddress.substring(0,6)}...{p.tokenAddress.substring(38)}</td>
+                              <td>{p.tokenAddress.substring(0, 6)}...{p.tokenAddress.substring(38)}</td>
                               <td>
                                 <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
                               </td>
-                              <td style={{textAlign:'right', color: isWin ? '#00e676' : '#ff3d00'}}>
+                              <td style={{ textAlign: 'right', color: isWin ? '#00e676' : '#ff3d00' }}>
                                 {pnlRatio > 0 ? '+' : ''}{pnlRatio.toFixed(2)}%
                               </td>
-                              <td style={{textAlign:'right'}}>
+                              <td style={{ textAlign: 'right' }}>
                                 {isWin ? (
                                   <span className="badge badge-pass">WIN</span>
                                 ) : (
@@ -211,7 +213,7 @@ export default async function Dashboard() {
                     {logs.map((l: any) => {
                       const levelClass = l.level === 'ERROR' ? 'log-error'
                         : l.level === 'WARN' ? 'log-warn'
-                        : 'log-info';
+                          : 'log-info';
                       return (
                         <div key={l.id} className={`log-item ${levelClass}`}>
                           <span className="log-time">
@@ -222,7 +224,7 @@ export default async function Dashboard() {
                             {l.message}
                             {l.meta && l.meta.txHash && (
                               <a href={`https://robinhoodchain.blockscout.com/tx/${l.meta.txHash}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', color: '#4facfe', fontSize: '12px' }}>
-                                 View TX
+                                View TX
                               </a>
                             )}
                           </span>
