@@ -87,7 +87,14 @@ export default async function Dashboard() {
                     ) : (
                       positions.map((p: any) => (
                         <tr key={p.id}>
-                          <td>{p.tokenAddress.substring(0, 6)}...{p.tokenAddress.substring(38)}</td>
+                          <td>
+                            <div style={{ fontWeight: 600 }}>
+                              {p.tokenName ? `${p.tokenName} (${p.tokenSymbol})` : `${p.tokenAddress.substring(0, 6)}...${p.tokenAddress.substring(38)}`}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+                              Entry: {p.entryPrice ? p.entryPrice.toFixed(8) : '-'}
+                            </div>
+                          </td>
                           <td>
                             <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
                           </td>
@@ -132,7 +139,14 @@ export default async function Dashboard() {
                           const isWin = pnlRatio > 0;
                           return (
                             <tr key={p.id}>
-                              <td>{p.tokenAddress.substring(0, 6)}...{p.tokenAddress.substring(38)}</td>
+                              <td>
+                                <div style={{ fontWeight: 600 }}>
+                                  {p.tokenName ? `${p.tokenName} (${p.tokenSymbol})` : `${p.tokenAddress.substring(0, 6)}...${p.tokenAddress.substring(38)}`}
+                                </div>
+                                <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+                                  Entry: {p.entryPrice ? p.entryPrice.toFixed(8) : '-'} | Exit: {p.exitPrice ? p.exitPrice.toFixed(8) : '-'}
+                                </div>
+                              </td>
                               <td>
                                 <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
                               </td>
