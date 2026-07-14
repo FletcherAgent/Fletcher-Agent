@@ -11,6 +11,8 @@ export default async function Dashboard() {
   let signals = [];
   let positions = [];
   let logs: any[] = [];
+  let totalSignals = 0;
+  let openPositionsCount = 0;
 
   try {
     const res = await fetch(`${API_URL}/api/dashboard`, { cache: 'no-store' });
@@ -20,12 +22,12 @@ export default async function Dashboard() {
       signals = data.signals || [];
       positions = data.positions || [];
       logs = data.logs || [];
+      totalSignals = data.totalSignals || 0;
+      openPositionsCount = data.openPositionsCount || 0;
     }
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
   }
-
-  const openPositionsCount = positions.filter((p: any) => p.status === 'OPEN').length;
 
   return (
     <>
@@ -55,7 +57,7 @@ export default async function Dashboard() {
           </div>
           <div className="kpi-card">
             <div className="kpi-label">Signals Intercepted</div>
-            <div className="kpi-val">{signals.length}</div>
+            <div className="kpi-val">{totalSignals}</div>
           </div>
         </div>
 
