@@ -229,12 +229,19 @@ export default async function Dashboard() {
                 ) : (
                   <div className="target-list">
                     {wallets.map((w: any) => (
-                      <div key={w.id} className="target-item">
+                      <div key={w.id} className="target-item" style={{ marginBottom: '15px' }}>
                         <div className="tgt-head">
                           <div className="tgt-name">{w.label || 'Unnamed Wallet'}</div>
                           <span className={`badge badge-tier${w.tier}`}>TIER {w.tier}</span>
                         </div>
                         <div className="tgt-addr">{w.address}</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '8px', color: '#888' }}>
+                          <span>Signals: {w.totalSignals || 0}</span>
+                          <span>Win Rate: {w.winRate != null ? w.winRate.toFixed(1) + '%' : 'N/A'}</span>
+                          <span style={{ color: w.avgPnlR && w.avgPnlR > 0 ? '#00e676' : w.avgPnlR && w.avgPnlR < 0 ? '#ff3d00' : 'inherit' }}>
+                            Avg P&L: {w.avgPnlR != null ? (w.avgPnlR > 0 ? '+' : '') + (w.avgPnlR * 100).toFixed(2) + '%' : 'N/A'}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
