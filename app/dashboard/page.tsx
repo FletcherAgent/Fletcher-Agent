@@ -174,10 +174,16 @@ export default async function Dashboard() {
                             </span>
                             {/* BUY / SELL badge */}
                             {isBuy && (
-                              <span className="badge" style={{ background: 'rgba(0,230,118,0.15)', color: '#00e676', border: '1px solid #00e67644' }}>🛒 BUY</span>
+                              <span className="badge" style={{ background: 'rgba(0,230,118,0.15)', color: '#00e676', border: '1px solid #00e67644' }}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '4px', verticalAlign: 'text-bottom'}}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                                BUY
+                              </span>
                             )}
                             {isSell && (
-                              <span className="badge" style={{ background: 'rgba(255,61,0,0.15)', color: '#ff6d3a', border: '1px solid #ff3d0044' }}>💥 SELL</span>
+                              <span className="badge" style={{ background: 'rgba(255,61,0,0.15)', color: '#ff6d3a', border: '1px solid #ff3d0044' }}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '4px', verticalAlign: 'text-bottom'}}><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
+                                SELL
+                              </span>
                             )}
                             {!isBuy && !isSell && (
                               <span className={`badge badge-${s.source.toLowerCase()}`}>{s.source}</span>
