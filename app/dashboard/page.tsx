@@ -9,6 +9,7 @@ export default async function Dashboard() {
   let wallets = [];
   let signals = [];
   let positions = [];
+  let logs: any[] = [];
 
   try {
     const res = await fetch(`${API_URL}/api/dashboard`, { cache: 'no-store' });
@@ -17,6 +18,7 @@ export default async function Dashboard() {
       wallets = data.wallets || [];
       signals = data.signals || [];
       positions = data.positions || [];
+      logs = data.logs || [];
     }
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
@@ -176,6 +178,33 @@ export default async function Dashboard() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── Activity Log ── */}
+            <div className="dash-panel" style={{ marginTop: '20px' }}>
+              <div className="panel-head">Activity Log</div>
+              <div className="panel-body scroll-area h-96">
+                {logs.length === 0 ? (
+                  <div className="empty-state">No activity logged yet.</div>
+                ) : (
+                  <div className="log-list">
+                    {logs.map((l: any) => {
+                      const levelClass = l.level === 'ERROR' ? 'log-error'
+                        : l.level === 'WARN' ? 'log-warn'
+                        : 'log-info';
+                      return (
+                        <div key={l.id} className={`log-item ${levelClass}`}>
+                          <span className="log-time">
+                            {new Date(l.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </span>
+                          <span className={`log-badge log-badge-${l.level.toLowerCase()}`}>{l.level}</span>
+                          <span className="log-msg">{l.message}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
