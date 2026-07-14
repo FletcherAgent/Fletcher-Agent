@@ -33,7 +33,6 @@ export default async function Dashboard() {
   return (
     <>
       <Navbar />
-      <AutoRefresh interval={3000} />
 
       <main className="dashboard-main wrap">
 
@@ -42,9 +41,12 @@ export default async function Dashboard() {
             <h1>System Dashboard</h1>
             <p className="dash-sub">Real-time overview of Fletcher agents and targets.</p>
           </div>
-          <div className="status-badge">
-            <span className="pulse-dot"></span>
-            System Online
+          <div className="status-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div>
+              <span className="pulse-dot"></span>
+              System Online
+            </div>
+            <AutoRefresh interval={3000} />
           </div>
         </div>
 
