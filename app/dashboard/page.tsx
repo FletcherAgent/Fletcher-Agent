@@ -1,5 +1,6 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import ClientTime from "../components/ClientTime";
 
 export const dynamic = 'force-dynamic';
 
@@ -198,7 +199,7 @@ export default async function Dashboard() {
                       return (
                         <div key={l.id} className={`log-item ${levelClass}`}>
                           <span className="log-time">
-                            {new Date(l.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                            <ClientTime timestamp={l.createdAt} />
                           </span>
                           <span className={`log-badge log-badge-${l.level.toLowerCase()}`}>{l.level}</span>
                           <span className="log-msg">
