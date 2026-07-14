@@ -4,6 +4,27 @@ import { useEffect, useState } from "react";
 
 export default function Mind() {
   const [activeTab, setActiveTab] = useState("feed");
+  const [logs, setLogs] = useState<any[]>([]);
+  const [positions, setPositions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchMindData = async () => {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://fletcher-core-production-d4b8.up.railway.app";
+      try {
+        const res = await fetch(`${API_URL}/api/dashboard`);
+        if (res.ok) {
+          const data = await res.json();
+          setLogs(data.logs || []);
+          setPositions(data.positions || []);
+        }
+      } catch (e) {
+        console.error("Failed to fetch mind data", e);
+      }
+    };
+    fetchMindData();
+    const intv = setInterval(fetchMindData, 5000);
+    return () => clearInterval(intv);
+  }, []);
 
   useEffect(() => {
     const canvas = document.getElementById("swarm") as HTMLCanvasElement;
@@ -184,64 +205,61 @@ export default function Mind() {
                 className={`mind-tab ${activeTab === "lb" ? "on" : ""}`}
                 onClick={() => setActiveTab("lb")}
               >
-                Risk Radar
+                Live Open Positions
               </button>
             </div>
             <div className="mind-body">
               {activeTab === "feed" && (
-                <div className="feed" id="feed">
-                  <div className="feed-line">
-                    <span className="ts">[23.14.05]</span> <span className="ag">ORCHESTRATOR</span> Starting Fletcher Minimum Viable Swarm...
-                  </div>
-                  <div className="feed-line">
-                    <span className="ts">[23.14.07]</span> <span className="ag">SCOUT</span> Connected to Robinhood Chain RPC
-                  </div>
-                  <div className="feed-line">
-                    <span className="ts">[23.14.10]</span> <span className="ag">TRADER</span> Telegram Bot online, awaiting user /mode
-                  </div>
-                  <div className="feed-line">
-                    <span className="ts">[23.14.12]</span> <span className="ag">SCOUT</span> PoolCreated event detected: 0x9a3f...
-                  </div>
-                  <div className="feed-line">
-                    <span className="ts">[23.14.13]</span> <span className="ag">GUARDIAN</span> Analyzing contract... <span className="up">SAFE</span>
-                  </div>
-                  <div className="feed-line">
-                    <span className="ts">[23.14.15]</span> <span className="ag">LP_MANAGER</span> Calculated IL at 0.4%, rebalancing ticks
-                  </div>
+                <div className="feed scroll-area h-96" id="feed">
+                  {logs.length === 0 ? (
+                    <div className="empty-state" style={{ padding: '20px', color: '#666' }}>Awaiting terminal activity...</div>
+                  ) : (
+                    logs.slice(0, 50).map((l: any) => {
+                      const timeStr = new Date(l.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                      const levelColor = l.level === 'ERROR' ? '#ff3d00' : l.level === 'WARN' ? '#ffb300' : '#4facfe';
+                      return (
+                        <div key={l.id} className="feed-line">
+                          <span className="ts">[{timeStr}]</span> <span className="ag" style={{ color: levelColor }}>{l.level}</span> {l.message}
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               )}
               {activeTab === "lb" && (
-                <div className="lb" id="lb" style={{ display: "block" }}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Token</th>
-                        <th>Liquidity</th>
-                        <th>Honeypot Risk</th>
-                        <th>Signal</th>
-                      </tr>
-                    </thead>
-                    <tbody id="lb-body">
-                      <tr>
-                        <td>NEXA</td>
-                        <td>$45k</td>
-                        <td><span className="score">Low</span></td>
-                        <td><span className="act enter">SNIPE</span></td>
-                      </tr>
-                      <tr>
-                        <td>PEPE-RH</td>
-                        <td>$12k</td>
-                        <td><span className="score">High</span></td>
-                        <td><span className="act avoid">AVOID</span></td>
-                      </tr>
-                      <tr>
-                        <td>DOGE-L2</td>
-                        <td>$100k</td>
-                        <td><span className="score">Low</span></td>
-                        <td><span className="act watch">LP FARM</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="lb scroll-area h-96" id="lb" style={{ display: "block" }}>
+                  {positions.length === 0 ? (
+                    <div className="empty-state" style={{ padding: '20px', color: '#666', textAlign: 'center' }}>No live positions currently open.</div>
+                  ) : (
+                    <table>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left' }}>Token</th>
+                          <th style={{ textAlign: 'left' }}>Entry Price</th>
+                          <th style={{ textAlign: 'center' }}>Source</th>
+                          <th style={{ textAlign: 'right' }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="lb-body">
+                        {positions.map((p: any) => (
+                          <tr key={p.id}>
+                            <td style={{ textAlign: 'left' }}>
+                              <div style={{ fontWeight: 600 }}>{p.tokenName ? `${p.tokenName} (${p.tokenSymbol})` : `${p.tokenAddress.substring(0,6)}...`}</div>
+                            </td>
+                            <td style={{ textAlign: 'left', fontFamily: 'monospace' }}>
+                              {p.entryPrice ? p.entryPrice.toFixed(8) : '-'} WETH
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <span className="act enter">OPEN</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
             </div>
