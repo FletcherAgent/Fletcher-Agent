@@ -201,7 +201,14 @@ export default async function Dashboard() {
                             {new Date(l.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                           </span>
                           <span className={`log-badge log-badge-${l.level.toLowerCase()}`}>{l.level}</span>
-                          <span className="log-msg">{l.message}</span>
+                          <span className="log-msg">
+                            {l.message}
+                            {l.meta && l.meta.txHash && (
+                              <a href={`https://robinhoodchain.blockscout.com/tx/${l.meta.txHash}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', color: '#4facfe', fontSize: '12px' }}>
+                                 View TX
+                              </a>
+                            )}
+                          </span>
                         </div>
                       );
                     })}
