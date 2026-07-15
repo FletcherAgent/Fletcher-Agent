@@ -14,6 +14,7 @@ export default async function Dashboard() {
   let logs: any[] = [];
   let totalSignals = 0;
   let openPositionsCount = 0;
+  let tradingMode = 'LIVE';
 
   try {
     const res = await fetch(`${API_URL}/api/dashboard`, { cache: 'no-store' });
@@ -25,6 +26,7 @@ export default async function Dashboard() {
       logs = data.logs || [];
       totalSignals = data.totalSignals || 0;
       openPositionsCount = data.openPositionsCount || 0;
+      tradingMode = data.tradingMode || 'LIVE';
     }
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
@@ -42,6 +44,9 @@ export default async function Dashboard() {
             <p className="dash-sub">Real-time overview of Fletcher agents and targets.</p>
           </div>
           <div className="status-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ padding: '2px 8px', borderRadius: '4px', background: tradingMode === 'DRY_RUN' ? 'rgba(255, 193, 7, 0.2)' : 'rgba(76, 175, 80, 0.2)', color: tradingMode === 'DRY_RUN' ? '#ffc107' : '#4caf50', fontWeight: 'bold', fontSize: '11px', border: `1px solid ${tradingMode === 'DRY_RUN' ? '#ffc107' : '#4caf50'}` }}>
+              {tradingMode === 'DRY_RUN' ? 'DRY RUN' : 'LIVE'}
+            </div>
             <div>
               <span className="pulse-dot"></span>
               System Online
@@ -78,6 +83,7 @@ export default async function Dashboard() {
                       <th>Token</th>
                       <th>Source</th>
                       <th>Status</th>
+                      <th>Mode</th>
                       <th style={{ textAlign: 'right' }}>Size (ETH)</th>
                     </tr>
                   </thead>
@@ -99,6 +105,9 @@ export default async function Dashboard() {
                           </td>
                           <td>
                             <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
+                          </td>
+                          <td>
+                            <span style={{ fontSize: '11px', fontWeight: 600, color: p.tradingMode === 'DRY_RUN' ? '#ffc107' : '#4caf50' }}>{p.tradingMode === 'DRY_RUN' ? 'DRY RUN' : 'LIVE'}</span>
                           </td>
                           <td>
                             <div className="status-cell">
@@ -130,6 +139,7 @@ export default async function Dashboard() {
                     <tr>
                       <th>Token</th>
                       <th>Agent (Source)</th>
+                      <th>Mode</th>
                       <th style={{ textAlign: 'right' }}>PnL (%)</th>
                       <th style={{ textAlign: 'right' }}>Result</th>
                     </tr>
@@ -155,6 +165,9 @@ export default async function Dashboard() {
                               </td>
                               <td>
                                 <span className={`badge badge-${p.source.toLowerCase()}`}>{p.source}</span>
+                              </td>
+                              <td>
+                                <span style={{ fontSize: '11px', fontWeight: 600, color: p.tradingMode === 'DRY_RUN' ? '#ffc107' : '#4caf50' }}>{p.tradingMode === 'DRY_RUN' ? 'DRY RUN' : 'LIVE'}</span>
                               </td>
                               <td style={{ textAlign: 'right', color: isWin ? '#00e676' : '#ff3d00' }}>
                                 {pnlRatio > 0 ? '+' : ''}{pnlRatio.toFixed(2)}%
