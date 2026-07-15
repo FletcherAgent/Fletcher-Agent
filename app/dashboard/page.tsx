@@ -135,8 +135,8 @@ export default async function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {positions.filter((p: any) => p.status === 'CLOSED').length === 0 ? (
-                      <tr><td colSpan={4} className="empty-state">No closed positions history.</td></tr>
+                    {positions.filter((p: any) => p.status === 'CLOSED' && p.entryPrice && p.exitPrice).length === 0 ? (
+                      <tr><td colSpan={4} className="empty-state">No completed trades with valid PnL yet.</td></tr>
                     ) : (
                       positions
                         .filter((p: any) => p.status === 'CLOSED' && p.entryPrice && p.exitPrice)
