@@ -82,10 +82,12 @@ export default async function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {positions.length === 0 ? (
+                    {positions.filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED').length === 0 ? (
                       <tr><td colSpan={4} className="empty-state">No active positions.</td></tr>
                     ) : (
-                      positions.map((p: any) => (
+                      positions
+                        .filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED')
+                        .map((p: any) => (
                         <tr key={p.id}>
                           <td>
                             <div style={{ fontWeight: 600 }}>
@@ -102,8 +104,12 @@ export default async function Dashboard() {
                             <div className="status-cell">
                               {p.status === 'OPEN' ? (
                                 <><span className="dot open"></span>Open</>
+                              ) : p.status === 'PENDING' ? (
+                                <><span className="dot" style={{ background: '#ffa000', boxShadow: '0 0 8px #ffa000' }}></span>Pending</>
+                              ) : p.status === 'EXITING' ? (
+                                <><span className="dot" style={{ background: '#29b6f6', boxShadow: '0 0 8px #29b6f6' }}></span>Exiting</>
                               ) : (
-                                <><span className="dot closed"></span>Closed</>
+                                <><span className="dot closed"></span>{p.status}</>
                               )}
                             </div>
                           </td>
