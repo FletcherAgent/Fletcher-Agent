@@ -135,11 +135,11 @@ export default async function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {positions.filter((p: any) => p.status === 'CLOSED' && p.entryPrice && p.exitPrice).length === 0 ? (
+                    {positions.filter((p: any) => p.status === 'CLOSED' && p.entryPrice != null && p.exitPrice != null).length === 0 ? (
                       <tr><td colSpan={4} className="empty-state">No completed trades with valid PnL yet.</td></tr>
                     ) : (
                       positions
-                        .filter((p: any) => p.status === 'CLOSED' && p.entryPrice && p.exitPrice)
+                        .filter((p: any) => p.status === 'CLOSED' && p.entryPrice != null && p.exitPrice != null)
                         .map((p: any) => {
                           const pnlRatio = p.pnl != null ? (p.pnl * 100) : (((p.exitPrice - p.entryPrice) / p.entryPrice) * 100);
                           const isWin = pnlRatio > 0;
@@ -150,7 +150,7 @@ export default async function Dashboard() {
                                   {p.tokenName ? `${p.tokenName} (${p.tokenSymbol})` : `${p.tokenAddress.substring(0, 6)}...${p.tokenAddress.substring(38)}`}
                                 </div>
                                 <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
-                                  Entry: {p.entryPrice ? p.entryPrice.toFixed(8) : '-'} | Exit: {p.exitPrice ? p.exitPrice.toFixed(8) : '-'}
+                                  Entry: {p.entryPrice != null ? p.entryPrice.toFixed(8) : '-'} | Exit: {p.exitPrice != null ? p.exitPrice.toFixed(8) : '-'}
                                 </div>
                               </td>
                               <td>
