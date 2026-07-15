@@ -113,7 +113,7 @@ export default async function Dashboard() {
                               )}
                             </div>
                           </td>
-                          <td style={{ textAlign: 'right' }}>{p.size.toFixed(4)}</td>
+                          <td style={{ textAlign: 'right' }}>{p.size.toFixed(6)}</td>
                         </tr>
                       ))
                     )}
