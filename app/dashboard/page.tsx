@@ -82,8 +82,8 @@ export default async function Dashboard() {
                     <tr>
                       <th>Token</th>
                       <th>Source</th>
-                      <th>Status</th>
                       <th>Mode</th>
+                      <th>Status</th>
                       <th style={{ textAlign: 'right' }}>Size (ETH)</th>
                     </tr>
                   </thead>
