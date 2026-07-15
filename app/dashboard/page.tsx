@@ -141,12 +141,13 @@ export default async function Dashboard() {
                       <th>Agent (Source)</th>
                       <th>Mode</th>
                       <th style={{ textAlign: 'right' }}>PnL (%)</th>
+                      <th>Reason</th>
                       <th style={{ textAlign: 'right' }}>Result</th>
                     </tr>
                   </thead>
                   <tbody>
                     {positions.filter((p: any) => p.status === 'CLOSED' && p.entryPrice != null && p.exitPrice != null).length === 0 ? (
-                      <tr><td colSpan={4} className="empty-state">No completed trades with valid PnL yet.</td></tr>
+                      <tr><td colSpan={5} className="empty-state">No completed trades with valid PnL yet.</td></tr>
                     ) : (
                       positions
                         .filter((p: any) => p.status === 'CLOSED' && p.entryPrice != null && p.exitPrice != null)
@@ -171,6 +172,11 @@ export default async function Dashboard() {
                               </td>
                               <td style={{ textAlign: 'right', color: isWin ? '#00e676' : '#ff3d00' }}>
                                 {pnlRatio > 0 ? '+' : ''}{pnlRatio.toFixed(2)}%
+                              </td>
+                              <td>
+                                <span style={{ fontSize: '10px', background: '#333', padding: '2px 6px', borderRadius: '4px' }}>
+                                  {p.exitReason || '-'}
+                                </span>
                               </td>
                               <td style={{ textAlign: 'right' }}>
                                 {isWin ? (
