@@ -82,11 +82,11 @@ export default async function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {positions.filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED').length === 0 ? (
+                    {positions.filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED' && p.status !== 'EXIT_FAILED').length === 0 ? (
                       <tr><td colSpan={4} className="empty-state">No active positions.</td></tr>
                     ) : (
                       positions
-                        .filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED')
+                        .filter((p: any) => p.status !== 'CLOSED' && p.status !== 'FAILED' && p.status !== 'EXIT_FAILED')
                         .map((p: any) => (
                         <tr key={p.id}>
                           <td>
