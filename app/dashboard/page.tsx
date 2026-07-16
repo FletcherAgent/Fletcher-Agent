@@ -24,8 +24,8 @@ export default async function Dashboard() {
       signals = data.signals || [];
       positions = data.positions || [];
       logs = data.logs || [];
-      totalSignals = data.totalSignals || 0;
-      openPositionsCount = data.openPositionsCount || 0;
+      totalSignals = data.metrics?.totalSignals || 0;
+      openPositionsCount = data.metrics?.openPositionsCount || 0;
       tradingMode = data.metrics?.tradingMode || 'LIVE';
     }
   } catch (error) {
