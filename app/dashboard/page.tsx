@@ -26,7 +26,7 @@ export default async function Dashboard() {
       logs = data.logs || [];
       totalSignals = data.totalSignals || 0;
       openPositionsCount = data.openPositionsCount || 0;
-      tradingMode = data.tradingMode || 'LIVE';
+      tradingMode = data.metrics?.tradingMode || 'LIVE';
     }
   } catch (error) {
     console.error("Failed to fetch dashboard data:", error);
