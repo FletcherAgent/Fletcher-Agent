@@ -7,7 +7,11 @@ interface TopbarProps {
 export function Topbar({ blk }: TopbarProps) {
   return (
     <header className="topbar">
-      <div className="wordmark">Fletcher<span className="tick">.</span></div>
+      <div className="wordmark">
+        <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          Fletcher<span className="tick">.</span>
+        </a>
+      </div>
       <div className="chainpill">
         <span className="dot"></span>
         ROBINHOOD CHAIN · 4663 · <span>#{blk.toLocaleString()}</span>
