@@ -1,16 +1,16 @@
 :root{
-  --bg:#0A0F0C;
-  --panel:#101812;
-  --panel-2:#0D1410;
-  --line:#1C2A20;
-  --green:#38C172;
-  --green-dim:#1E5C39;
-  --parch:#E9E4D6;
-  --mut:#6B7A6E;
-  --amber:#E0A82E;
-  --red:#D9534F;
+  --bg:#000000;
+  --panel:#080808;
+  --panel-2:#050505;
+  --line:#181818;
+  --green:#2bff5b;
+  --green-dim:rgba(43,255,91,.12);
+  --parch:#f2f2f2;
+  --mut:#8a8a8a;
+  --amber:#ffd84d;
+  --red:#ff4d6a;
   --mono:'IBM Plex Mono',monospace;
-  --serif:'DM Serif Display',serif;
+  --serif:'Space Grotesk',sans-serif;
 }
 .dashboard-v2-container {
   background:var(--bg);
@@ -104,11 +104,11 @@
 .fbtn{background:transparent;border:1px solid var(--green-dim);color:var(--green);font-family:var(--mono);font-size:10px;padding:2px 8px;cursor:pointer;border-radius:2px}
 .fbtn:hover{background:var(--green);color:#08110B}
 
-.sig{padding:9px 0;border-bottom:1px solid var(--panel);font-size:11px}
-.sig:last-child{border-bottom:none}
-.sig .w{color:var(--green)}
-.sig .t{color:var(--mut);font-size:10px}
-.sig .chase{color:var(--amber)}
+.v2-sig{padding:9px 0;border-bottom:1px solid var(--panel);font-size:11px}
+.v2-sig:last-child{border-bottom:none}
+.v2-sig .w{color:var(--green)}
+.v2-sig .t{color:var(--mut);font-size:10px}
+.v2-sig .chase{color:var(--amber)}
 
 /* ---------- log ---------- */
 .log{background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:12px 14px;height:210px;overflow-y:auto;font-size:11px}

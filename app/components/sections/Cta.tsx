@@ -8,7 +8,7 @@ export default function Cta() {
           Snipe Nexa Fun tokens and manage your liquidity on Robinhood Chain, completely hands-free.
         </p>
         <div className="cta-actions reveal">
-          <a href="/dashboard" className="btn-solid" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
+          <a href="/dashboard-v2" className="btn-solid" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
           <button className="btn-ghost">View on Github</button>
         </div>
       </div>

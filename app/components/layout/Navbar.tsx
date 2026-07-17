@@ -27,7 +27,7 @@ export default function Navbar() {
         <a href="/#roadmap">Roadmap</a>
       </nav>
       <div className="header-right">
-        <a href="/dashboard" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
+        <a href="/dashboard-v2" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
         <button className="burger" aria-label="Menu">
           <span></span>
           <span></span>
