@@ -20,9 +20,17 @@ export function PositionCard({ lpPositions }: { lpPositions: any[] }) {
         const pair = `${pos.token0Symbol || 'TKN0'} / ${pos.token1Symbol || 'TKN1'}`;
         const openedAt = new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
-        // Simplified visual approximations
-        const rangeWidth = pos.tickUpper - pos.tickLower > 100000 ? 96 : 46;
-        const rangeLeft = pos.tickUpper - pos.tickLower > 100000 ? 2 : 22;
+        // Calculate exact visual range relative to Uniswap V3 absolute bounds
+        const MIN_TICK = -887220;
+        const MAX_TICK = 887220;
+        const totalTickRange = MAX_TICK - MIN_TICK;
+        
+        let rangeLeft = ((pos.tickLower - MIN_TICK) / totalTickRange) * 100;
+        let rangeWidth = ((pos.tickUpper - pos.tickLower) / totalTickRange) * 100;
+        
+        // Ensure it stays within visual bounds and is at least 2% wide to be visible
+        rangeLeft = Math.max(0, Math.min(98, rangeLeft));
+        rangeWidth = Math.max(2, Math.min(100 - rangeLeft, rangeWidth));
         const isWarning = pos.ilRunning > pos.feesCollected;
         const arrowColor = isWarning ? "#E0A82E" : "#38C172";
         const head3Left = rangeLeft + (rangeWidth / 2);
