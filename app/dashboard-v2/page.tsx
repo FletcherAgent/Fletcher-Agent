@@ -14,7 +14,6 @@ import { Footer } from "../../components/dashboard-v2/Footer";
 
 export default function DashboardV2() {
   const [blk, setBlk] = useState(2481395);
-  const [head3Left, setHead3Left] = useState(66);
   
   // Real Data State
   const [data, setData] = useState<{
@@ -47,19 +46,9 @@ export default function DashboardV2() {
       setBlk((prev) => prev + Math.floor(Math.random() * 4) + 2);
     }, 1200);
 
-    // Arrowhead drift
-    let p = 66, dir = 1;
-    const arrowInterval = setInterval(() => {
-      p += dir * (Math.random() * 1.4);
-      if (p > 68) dir = -1;
-      if (p < 60) dir = 1;
-      setHead3Left(p);
-    }, 2500);
-
     return () => {
       clearInterval(dataInterval);
       clearInterval(blkInterval);
-      clearInterval(arrowInterval);
     };
   }, []);
 
@@ -68,17 +57,21 @@ export default function DashboardV2() {
       <Topbar blk={blk} />
 
       <main className="wrap">
-        {/* LEFT: positions */}
+        {/* LEFT: Agent Log */}
         <section className="col">
-          <StatStrip metrics={data?.metrics} lpPositions={data?.lpPositions || []} />
-          <PositionCard lpPositions={data?.lpPositions || []} head3Left={head3Left} />
+          <AgentLog logs={data?.logs || []} />
         </section>
 
-        {/* RIGHT: screening + signals + log */}
+        {/* MIDDLE: positions */}
+        <section className="col">
+          <StatStrip metrics={data?.metrics} lpPositions={data?.lpPositions || []} />
+          <PositionCard lpPositions={data?.lpPositions || []} />
+        </section>
+
+        {/* RIGHT: screening + signals */}
         <aside className="col">
           <ScreeningFeed wallets={data?.wallets || []} />
           <TrackerSignals signals={data?.signals || []} />
-          <AgentLog logs={data?.logs || []} />
         </aside>
       </main>
 

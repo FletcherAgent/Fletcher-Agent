@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function PositionCard({ lpPositions, head3Left }: { lpPositions: any[], head3Left: number }) {
+export function PositionCard({ lpPositions }: { lpPositions: any[] }) {
   return (
     <div className="sect">
       <div className="sect-head">
@@ -25,7 +25,7 @@ export function PositionCard({ lpPositions, head3Left }: { lpPositions: any[], h
         const rangeLeft = pos.tickUpper - pos.tickLower > 100000 ? 2 : 22;
         const isWarning = pos.ilRunning > pos.feesCollected;
         const arrowColor = isWarning ? "#E0A82E" : "#38C172";
-        const fletchRight = rangeLeft + rangeWidth;
+        const head3Left = rangeLeft + (rangeWidth / 2);
 
         return (
           <article key={pos.id || idx} className={`pos ${isWarning ? 'out' : ''}`}>
@@ -46,7 +46,7 @@ export function PositionCard({ lpPositions, head3Left }: { lpPositions: any[], h
               <div className="fletch" style={{ left: `${rangeLeft}%` }}>
                 <svg width="14" height="18" viewBox="0 0 14 18"><path d="M2 0 L12 4 L12 8 L2 4 Z M2 6 L12 10 L12 14 L2 10 Z" fill={arrowColor} opacity=".85"/></svg>
               </div>
-              <div className="fletch" style={{ left: `calc(${fletchRight}% - 14px)` }}>
+              <div className="fletch" style={{ left: `calc(${rangeLeft + rangeWidth}% - 14px)` }}>
                 <svg width="14" height="18" viewBox="0 0 14 18"><path d="M12 0 L2 4 L2 8 L12 4 Z M12 6 L2 10 L2 14 L12 10 Z" fill={arrowColor} opacity=".85"/></svg>
               </div>
               <div className="head" style={{ left: `${head3Left}%` }}>
@@ -60,7 +60,7 @@ export function PositionCard({ lpPositions, head3Left }: { lpPositions: any[], h
               ) : (
                 <>
                   <span className="rl" style={{ left: `${rangeLeft}%` }}>{pos.tickLower}</span>
-                  <span className="rl" style={{ left: `${fletchRight - 4}%` }}>{pos.tickUpper}</span>
+                  <span className="rl" style={{ left: `${rangeLeft + rangeWidth - 4}%` }}>{pos.tickUpper}</span>
                 </>
               )}
             </div>

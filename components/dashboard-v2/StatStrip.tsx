@@ -16,6 +16,8 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
   const isHealthy = totalFees >= totalIl;
   const activeCount = lpPositions.length;
 
+  const cap = metrics?.maxPositionSize || 2000;
+  
   return (
     <div className="strip">
       <div className="stat">
@@ -31,7 +33,7 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
       <div className="stat">
         <div className="k">HARVESTED (ALL TIME)</div>
         <div className="v">${totalFees.toFixed(2)}</div>
-        <div className="sub">above $2K/position cap</div>
+        <div className="sub">above ${cap >= 1000 ? `${cap/1000}K` : cap}/position cap</div>
       </div>
       <div className="stat">
         <div className="k">FEE vs IL (24H)</div>

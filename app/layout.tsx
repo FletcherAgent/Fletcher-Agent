@@ -23,6 +23,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Fletcher Agent — AI-Powered Robinhood Chain Orchestrator",
   description: "First autonomous trading + liquidity agent on Robinhood Chain",
+  icons: {
+    icon: "/logo.PNG",
+  },
 };
 
 export default function RootLayout({

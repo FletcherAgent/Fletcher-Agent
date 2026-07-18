@@ -14,7 +14,7 @@ export function ScreeningFeed({ wallets }: { wallets: any[] }) {
         const addr = wallet.address.slice(0, 6) + '...' + wallet.address.slice(-4);
         const name = wallet.label || addr;
         const volDesc = `Tier ${wallet.tier} · ${wallet.winRate ? `${wallet.winRate}% WR` : 'New'}`;
-        const score = wallet.status === 'ACTIVE' ? '92' : 'VETO';
+        const score = wallet.status === 'ACTIVE' ? (wallet.winRate ? Math.round(wallet.winRate) : 'NEW') : 'VETO';
         
         return (
           <div className="feeditem" key={wallet.id || idx} style={wallet.status !== 'ACTIVE' ? { opacity: 0.45 } : {}}>
