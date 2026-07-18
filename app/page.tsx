@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import Hero from "./components/sections/Hero";
-import Architecture from "./components/sections/Architecture";
-import Belief from "./components/sections/Belief";
+import HowFletcherLPs from "./components/sections/HowFletcherLPs";
+import ZeroCustody from "./components/sections/ZeroCustody";
+import FletchTiers from "./components/sections/FletchTiers";
 import Agents from "./components/sections/Agents";
-import Mind from "./components/sections/Mind";
 import Safety from "./components/sections/Safety";
 import Roadmap from "./components/sections/Roadmap";
 import Cta from "./components/sections/Cta";
@@ -37,11 +37,11 @@ export default function Home() {
     <>
       <Navbar />
       <Hero />
-      <Architecture />
-      <Belief />
+      <HowFletcherLPs />
       <Agents />
-      <Mind />
       <Safety />
+      <ZeroCustody />
+      <FletchTiers />
       <Roadmap />
       <Cta />
       <Footer />

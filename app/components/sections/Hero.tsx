@@ -163,77 +163,21 @@ export default function Hero() {
     };
   }, []);
 
-  // Observers for counters
-  useEffect(() => {
-    const CH = "abcdefXYZLPx!%^(#01";
-    const els = document.querySelectorAll("[data-count]");
-    const ioCounters = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e: any) => {
-          if (!e.isIntersecting || e.target.dataset.done) return;
-          e.target.dataset.done = "1";
-          const target = parseFloat(e.target.dataset.count);
-          const dec = e.target.dataset.format === "dec";
-          const final = dec ? target.toFixed(1) : Math.round(target).toLocaleString("en-US");
-          const t0 = performance.now(),
-            scr = 900,
-            dur = 2600;
-          (function tick(now) {
-            const el = now - t0;
-            if (el < scr) {
-              const lock = Math.floor(final.length * (el / scr));
-              let s = "";
-              for (let i = 0; i < final.length; i++) {
-                s += i < lock ? final[i] : CH[(Math.random() * CH.length) | 0];
-              }
-              e.target.textContent = s;
-              requestAnimationFrame(tick);
-            } else {
-              const k = Math.min(1, (el - scr) / (dur - scr));
-              const v = target * (1 - Math.pow(1 - k, 3));
-              e.target.textContent = dec ? v.toFixed(1) : Math.round(v).toLocaleString("en-US");
-              if (k < 1) requestAnimationFrame(tick);
-            }
-          })(t0);
-        });
-      },
-      { threshold: 0.4 }
-    );
-    els.forEach((el) => ioCounters.observe(el));
-    return () => ioCounters.disconnect();
-  }, []);
+
 
   return (
     <div className="hero">
       <canvas id="binfield"></canvas>
 
-      <div className="hero-stats">
-        <div>
-          <div className="stat-label">Tokens Sniped</div>
-          <div className="stat-value" data-count="3204" data-format="int">
-            0
-          </div>
-        </div>
-        <div>
-          <div className="stat-label">Alpha Wallets Tracked</div>
-          <div className="stat-value" data-count="1485" data-format="int">
-            0
-          </div>
-        </div>
-        <div>
-          <div className="stat-label">Realized Profit</div>
-          <div className="stat-value">
-            $<span data-count="84920" data-format="dec">0</span>
-          </div>
-        </div>
-      </div>
-
       <div className="hero-copy">
-        <h1>Autonomous sniping & copy-trading on Robinhood Chain</h1>
+        <h1>AUTONOMOUS LIQUIDITY ON ROBINHOOD CHAIN</h1>
         <p className="hero-sub">
-          A specialized swarm of six agents executing sub-second trades and protecting capital.
-          Fletcher monitors NOXA Token launches, mirrors Alpha wallets, and enforces strict risk parameters.
+          Fletcher manages concentrated liquidity positions on its own: screening pairs, deploying ranges, compounding fees, and exiting when impermanent loss outruns yield. Sniping and smart-money copy-trading ride on top. You hold the keys the entire time.
         </p>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '32px' }}>
+          <a href="/dashboard-v2" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
+          <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #2bff5b', color: '#2bff5b' }}>View on Github</a>
+        </div>
       </div>
 
       <div className="scroll-cue">⌄</div>

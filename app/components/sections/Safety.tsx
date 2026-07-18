@@ -8,35 +8,35 @@ export default function Safety() {
         <div className="safety-grid">
           <div className="term reveal">
             <div className="row">
-              <span className="k">MODE</span>
-              <span className="v-true">CONFIRM</span>
+              <span className="k">SAFETY_GATE</span>
+              <span className="v-true">ACTIVE</span>
+            </div>
+            <div className="row">
+              <span className="k">HONEYPOT_SIM</span>
+              <span className="v-true">ROUND-TRIP PASSED</span>
+            </div>
+            <div className="row">
+              <span className="k">RE_SIMULATION</span>
+              <span className="v-true">DELAYED OK</span>
+            </div>
+            <div className="row">
+              <span className="k">VETO_LOG</span>
+              <span className="v-true">TRACKED</span>
             </div>
             <div className="row">
               <span className="k">DAILY_DRAWDOWN</span>
               <span className="v-true">15% MAX</span>
             </div>
             <div className="row">
-              <span className="k">PORTFOLIO_HEAT</span>
-              <span className="v-true">5 ACTIVE</span>
-            </div>
-            <div className="row">
-              <span className="k">TRAILING_STOP</span>
-              <span className="v-true">TRUE</span>
-            </div>
-            <div className="row">
-              <span className="k">SNIPE_SIZE</span>
-              <span>0.5% bps</span>
-            </div>
-            <div className="row">
-              <span className="k">TIMEOUT</span>
-              <span>5 MINUTES</span>
+              <span className="k">CHECKS_PASSED</span>
+              <span>13 / 13</span>
             </div>
           </div>
           <ul className="safety-list reveal">
-            <li>Every snipe sends a Telegram push notification with Confirm / Reject buttons.</li>
-            <li>Unconfirmed snipes expire automatically after 5 minutes to prevent stale execution.</li>
-            <li>Risk Warden continuously calculates daily PnL and strictly enforces a 15% maximum drawdown.</li>
-            <li>Guardian Protocol locks in profits with dynamic trailing stop-losses on all open positions.</li>
+            <li>Strict 13-point Safety Gate screening before any capital deployment.</li>
+            <li>Real-time honeypot round-trip simulation to verify token sellability.</li>
+            <li>Delayed-honeypot re-simulation to catch dynamic taxes and time-locked rug pulls.</li>
+            <li>Immutable Veto Log tracking all rejected pairs to optimize future capital allocation.</li>
           </ul>
         </div>
       </div>

@@ -5,11 +5,11 @@ export default function Cta() {
         <div className="eyebrow reveal">Deploy</div>
         <h2 className="reveal">Autonomous DeFi starts here</h2>
         <p className="lede reveal">
-          Snipe Nexa Fun tokens and manage your liquidity on Robinhood Chain, completely hands-free.
+          LP the meta, snipe NOXA launches, and mirror smart money on Robinhood Chain. Completely hands-free, completely zero-custody.
         </p>
         <div className="cta-actions reveal">
           <a href="/dashboard-v2" className="btn-solid" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
-          <button className="btn-ghost">View on Github</button>
+          <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View on Github</a>
         </div>
       </div>
     </section>
