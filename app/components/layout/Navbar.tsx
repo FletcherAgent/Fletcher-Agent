@@ -1,8 +1,9 @@
 export default function Navbar() {
   return (
     <header>
-      <a className="logo" href="/">
+      <a className="logo" href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
         <img src="/logo.PNG" alt="Fletcher Logo" style={{ height: '40px', objectFit: 'contain' }} />
+        <span className="logo-name" style={{ fontSize: '18px', fontWeight: 'bold', color: '#f2f2f2', letterSpacing: '1px' }}>FLETCHER</span>
       </a>
       <nav>
         <a href="/#architecture">Architecture</a>

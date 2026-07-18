@@ -3,8 +3,9 @@ export default function Footer() {
     <footer>
       <div className="foot-grid">
         <div className="foot-brand">
-          <a className="logo" href="#">
+          <a className="logo" href="#" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             <img src="/logo.PNG" alt="Fletcher Logo" style={{ height: '30px', objectFit: 'contain' }} />
+            <span className="logo-name" style={{ fontSize: '15px', fontWeight: 'bold', color: '#f2f2f2', letterSpacing: '1px' }}>FLETCHER</span>
           </a>
           <p>Autonomous Trading and Liquidity Swarm for Robinhood Chain.</p>
         </div>
