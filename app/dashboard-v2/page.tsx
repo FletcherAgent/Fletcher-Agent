@@ -15,17 +15,33 @@ import { Footer } from "../../components/dashboard-v2/Footer";
 export default function DashboardV2() {
   const [blk, setBlk] = useState(2481395);
   const [head3Left, setHead3Left] = useState(66);
-  const [logs, setLogs] = useState([
-    ["ok", "[GUARDIAN]", "sell re-sim PASS · 3/3 positions"],
-    ["ok", "[LP-ENGINE]", "collected $38.20 fees HOODAI/WETH → compounded"],
-    ["veto", "[SAFETY]", "VETO 0xa41f…c2 · sell simulation reverted · blacklisted"],
-    ["ok", "[TRACKER]", "early-2 BUY detected · TERMX · chase 1.1×"],
-    ["warn", "[GUARDIAN]", "CASHCAT/WETH price 91% through range · rebalance proposed"],
-    ["ok", "[SCREEN]", "4 pairs pass filter · meta=utility · flap.fun excluded"],
-    ["ok", "[RISK]", "portfolio heat 34% · within cap"],
-  ]);
+  
+  // Real Data State
+  const [data, setData] = useState<{
+    wallets: any[];
+    signals: any[];
+    positions: any[];
+    lpPositions: any[];
+    logs: any[];
+    metrics: any;
+  } | null>(null);
 
   useEffect(() => {
+    // Fetch real data from backend
+    const fetchData = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${apiUrl}/api/dashboard`);
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data", err);
+      }
+    };
+
+    fetchData();
+    const dataInterval = setInterval(fetchData, 3000);
+
     // Block ticker
     const blkInterval = setInterval(() => {
       setBlk((prev) => prev + Math.floor(Math.random() * 4) + 2);
@@ -40,27 +56,10 @@ export default function DashboardV2() {
       setHead3Left(p);
     }, 2500);
 
-    // Log lines generator
-    const logInterval = setInterval(() => {
-      const possibleLines = [
-        ["ok", "[LP-ENGINE]", "fee vs IL check · 3/3 hold"],
-        ["ok", "[TRACKER]", "block scan · 7 wallets · no new tx"],
-        ["ok", "[GUARDIAN]", "sell re-sim PASS · 3/3 positions"],
-        ["warn", "[SCREEN]", "AGNTFI holder concentration 27% · score penalty"],
-        ["ok", "[RISK]", "heat 34% · LP $5.9K + trench $0"],
-        ["ok", "[LP-ENGINE]", "collected $12.44 fees RWAX/USDC → compounded"],
-      ];
-      const l = possibleLines[Math.floor(Math.random() * possibleLines.length)];
-      setLogs((prevLogs) => {
-        const newLogs = [l, ...prevLogs];
-        return newLogs.slice(0, 30);
-      });
-    }, 4000);
-
     return () => {
+      clearInterval(dataInterval);
       clearInterval(blkInterval);
       clearInterval(arrowInterval);
-      clearInterval(logInterval);
     };
   }, []);
 
@@ -71,15 +70,15 @@ export default function DashboardV2() {
       <main className="wrap">
         {/* LEFT: positions */}
         <section className="col">
-          <StatStrip />
-          <PositionCard head3Left={head3Left} />
+          <StatStrip metrics={data?.metrics} lpPositions={data?.lpPositions || []} />
+          <PositionCard lpPositions={data?.lpPositions || []} head3Left={head3Left} />
         </section>
 
         {/* RIGHT: screening + signals + log */}
         <aside className="col">
-          <ScreeningFeed />
-          <TrackerSignals />
-          <AgentLog logs={logs} />
+          <ScreeningFeed wallets={data?.wallets || []} />
+          <TrackerSignals signals={data?.signals || []} />
+          <AgentLog logs={data?.logs || []} />
         </aside>
       </main>
 

@@ -1,24 +1,31 @@
 import React from 'react';
 
-export function TrackerSignals() {
+export function TrackerSignals({ signals }: { signals: any[] }) {
   return (
     <div className="sect">
       <div className="sect-head">
         <h2>Tracker signals</h2>
-        <span className="tag">7 WALLETS · 3 BUNDLES</span>
+        <span className="tag">LATEST {signals.length}</span>
       </div>
-      <div className="v2-sig">
-        <span className="w">early-2</span> bought <b>TERMX</b> @ $410K mc · <span className="t">2m ago</span><br />
-        <span className="ok" style={{ color: "var(--green)" }}>chase guard PASS (1.1×) · queued behind safety gate</span>
-      </div>
-      <div className="v2-sig">
-        <span className="w">nachsol</span> bought <b>MEOWFI</b> @ $95K mc · <span className="t">18m ago</span><br />
-        <span className="chase">chase guard SKIP · current mc 3.4× entry</span>
-      </div>
-      <div className="v2-sig">
-        <span className="w">bundle-A ×3</span> confluence on <b>HOODSCAN</b> · <span className="t">41m ago</span><br />
-        <span style={{ color: "var(--green)" }}>deduped → 1 signal · confidence HIGH</span>
-      </div>
+      {signals.length === 0 && (
+        <div style={{ padding: '1rem', color: 'var(--mute)' }}>No signals yet.</div>
+      )}
+      {signals.map((sig, idx) => {
+        const timeStr = new Date(sig.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const isCopy = sig.source === 'COPYTRADE';
+        const sourceLabel = isCopy ? (sig.copiedFrom?.slice(0,6) || 'wallet') : 'scout';
+
+        return (
+          <div className="v2-sig" key={sig.id || idx}>
+            <span className="w">{sourceLabel}</span> signaled <b>{sig.tokenAddress.slice(0, 6)}...</b> · <span className="t">{timeStr}</span><br />
+            {sig.passed ? (
+              <span className="ok" style={{ color: "var(--green)" }}>evaluation PASS (score: {sig.score.toFixed(1)}) · executing</span>
+            ) : (
+              <span className="chase">evaluation SKIP (score: {sig.score.toFixed(1)})</span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
