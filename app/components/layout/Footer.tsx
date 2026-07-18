@@ -4,22 +4,7 @@ export default function Footer() {
       <div className="foot-grid">
         <div className="foot-brand">
           <a className="logo" href="#">
-            <svg viewBox="0 0 40 40" fill="none" stroke="#f2f2f2" strokeWidth="1.6" style={{ width: "30px", height: "30px" }}>
-              <line x1="20" y1="2" x2="20" y2="14" />
-              <line x1="20" y1="26" x2="20" y2="38" />
-              <line x1="2" y1="20" x2="14" y2="20" />
-              <line x1="26" y1="20" x2="38" y2="20" />
-              <line x1="7" y1="7" x2="15" y2="15" />
-              <line x1="25" y1="25" x2="33" y2="33" />
-              <line x1="33" y1="7" x2="25" y2="15" />
-              <line x1="15" y1="25" x2="7" y2="33" />
-              <circle cx="20" cy="20" r="3.5" stroke="#2bff5b" />
-            </svg>
-            <span className="logo-name" style={{ fontSize: "13px" }}>
-              FLETCH
-              <br />
-              ER
-            </span>
+            <img src="/logo.PNG" alt="Fletcher Logo" style={{ height: '30px', objectFit: 'contain' }} />
           </a>
           <p>Autonomous Trading and Liquidity Swarm for Robinhood Chain.</p>
         </div>
@@ -37,6 +22,12 @@ export default function Footer() {
         <div className="foot-col">
           <h4>Community</h4>
           <a href="#">Telegram</a>
+          <a href="https://x.com/fletcheragent21?s=11" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            X (Twitter)
+          </a>
         </div>
       </div>
       <div className="watermark">FLETCHER</div>

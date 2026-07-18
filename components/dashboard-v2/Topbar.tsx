@@ -8,8 +8,8 @@ export function Topbar({ blk }: TopbarProps) {
   return (
     <header className="topbar">
       <div className="wordmark">
-        <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-          Fletcher<span className="tick">.</span>
+        <a href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+          <img src="/logo.PNG" alt="Fletcher Logo" style={{ height: '32px', objectFit: 'contain' }} />
         </a>
       </div>
       <div className="chainpill">
