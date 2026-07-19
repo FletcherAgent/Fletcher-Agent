@@ -42,6 +42,11 @@ export function PositionCard({ lpPositions }: { lpPositions: any[] }) {
               <span className={`mode-b ${isNight ? 'night' : 'day'}`}>
                 {isNight ? 'NIGHT · SPRAY' : 'DAY · FULL RANGE'}
               </span>
+              {pos.source === 'ALPHA' && (
+                <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
+                  ★ ALPHA
+                </span>
+              )}
               <span className="apr" style={{ color: isWarning ? "var(--amber)" : "var(--green)" }}>
                 Active
               </span>
