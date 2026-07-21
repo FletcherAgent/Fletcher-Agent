@@ -2,11 +2,12 @@ import React from 'react';
 
 export function ScreeningFeed({ wallets }: { wallets: any[] }) {
   return (
-    <div className="sect">
-      <div className="sect-head">
+    <div className="sect sect-fill" style={{ flex: '0 1 auto', paddingBottom: '0', marginBottom: '12px', maxHeight: '50%' }}>
+      <div className="sect-head" style={{ flexShrink: 0 }}>
         <h2>Screening feed</h2>
         <span className="tag">GMGN 24H · AI DETECTED</span>
       </div>
+      <div className="scrollable" style={{ display: 'flex', flexDirection: 'column', paddingRight: '4px', paddingBottom: '12px' }}>
       {wallets.length === 0 && (
         <div style={{ padding: '1rem', color: 'var(--mute)' }}>No active screening data.</div>
       )}
@@ -27,6 +28,7 @@ export function ScreeningFeed({ wallets }: { wallets: any[] }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

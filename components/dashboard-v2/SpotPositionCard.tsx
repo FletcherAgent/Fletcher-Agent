@@ -2,14 +2,14 @@ import React from 'react';
 
 export function SpotPositionCard({ positions }: { positions: any[] }) {
   return (
-    <div className="sect" style={{ marginTop: "1rem" }}>
-      <div className="sect-head">
+    <div className="sect sect-fill" style={{ flex: '0 0 auto', paddingBottom: '0', marginBottom: '0' }}>
+      <div className="sect-head" style={{ flexShrink: 0 }}>
         <h2>History Positions</h2>
         <span className="tag" style={{ marginLeft: "auto" }}>Closed & Failed</span>
       </div>
 
-      <div className="scrollable" style={{ paddingBottom: "12px", maxHeight: "1070px" }}>
-        {positions.length === 0 && (
+        <div className="scrollable" style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px', paddingBottom: '12px' }}>
+      {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
           No historical positions found.
         </div>
@@ -19,10 +19,12 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
         const openedAt = new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const isClosed = pos.status === 'CLOSED';
         const isFailed = pos.status === 'EXIT_FAILED' || pos.status === 'FAILED';
+        const isExiting = pos.status === 'EXITING';
         
         let statusColor = "var(--amber)";
         if (isClosed) statusColor = "var(--mute)";
         if (isFailed) statusColor = "var(--red)";
+        if (isExiting) statusColor = "#E0A82E";
 
         // LP POSITION HISTORY
         if (pos._type === 'LP') {
@@ -52,11 +54,33 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
               </div>
               
               <div className="verdict" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
-                <div>
-                  {isClosed && <><span className="warn">▶ CLOSED</span></>}
-                  {isFailed && <span className="warn">▶ FAILED</span>}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {isClosed && (
+                    <span className="warn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      CLOSED
+                    </span>
+                  )}
+                  {isFailed && (
+                    <span className="warn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+                      </svg>
+                      FAILED
+                    </span>
+                  )}
+                  {isExiting && (
+                    <span className="warn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: "#E0A82E" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      EXITING
+                    </span>
+                  )}
                 </div>
-                <div style={{ fontWeight: 'bold', color: pos.ilRunning > 0 ? "var(--red)" : "var(--green)" }}>
+                <div style={{ fontWeight: 'bold', color: pos.ilRunning < 0 ? "var(--red)" : "var(--green)" }}>
                   IL: ${Number(pos.ilRunning || 0).toFixed(2)}
                 </div>
               </div>
@@ -108,9 +132,26 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
             </div>
             
             <div className="verdict" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
-              <div>
-                {isClosed && <><span className="warn">▶ EXIT REASON:</span> {pos.exitReason || 'Manual'}</>}
-                {isFailed && <span className="warn">▶ EXIT FAILED</span>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {isClosed && (
+                  <>
+                    <span className="warn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                      EXIT REASON:
+                    </span> 
+                    <span>{pos.exitReason || 'Manual'}</span>
+                  </>
+                )}
+                {isFailed && (
+                  <span className="warn" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    EXIT FAILED
+                  </span>
+                )}
               </div>
               <div style={{ fontWeight: 'bold', color: pnlColor }}>
                 PNL: {pnlText}

@@ -2,13 +2,14 @@ import React from 'react';
 
 export function PositionCard({ positions }: { positions: any[] }) {
   return (
-    <div className="sect">
-      <div className="sect-head">
+    <div className="sect sect-fill" style={{ flex: '0 0 auto', paddingBottom: '0', marginBottom: '12px' }}>
+      <div className="sect-head" style={{ flexShrink: 0 }}>
         <h2>Open Positions</h2>
         <span className="tag live">[LIVE]</span>
         <span className="tag" style={{ marginLeft: "auto" }}>CAP $2K / POS · MAX 3</span>
       </div>
 
+      <div className="scrollable" style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px', paddingBottom: '12px' }}>
       {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
           No open positions currently.
@@ -171,6 +172,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
           </article>
         );
       })}
+      </div>
     </div>
   );
 }

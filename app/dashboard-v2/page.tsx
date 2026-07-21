@@ -63,7 +63,7 @@ export default function DashboardV2() {
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const historyPositions = [
-    ...rawLp.filter(p => p.status === 'CLOSED' || p.status === 'FAILED').map(p => ({ ...p, _type: 'LP' })),
+    ...rawLp.filter(p => p.status !== 'OPEN' && p.status !== 'PENDING').map(p => ({ ...p, _type: 'LP' })),
     ...rawSpot.filter(p => p.status !== 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 

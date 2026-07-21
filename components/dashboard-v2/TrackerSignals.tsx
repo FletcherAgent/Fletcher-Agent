@@ -2,8 +2,8 @@ import React from 'react';
 
 export function TrackerSignals({ signals }: { signals: any[] }) {
   return (
-    <div className="sect sect-fill">
-      <div className="sect-head">
+    <div className="sect sect-fill" style={{ flex: '0 0 auto', paddingBottom: '0', marginBottom: '0' }}>
+      <div className="sect-head" style={{ flexShrink: 0 }}>
         <h2>Tracker signals</h2>
         <span className="tag">LATEST {signals.length}</span>
       </div>
