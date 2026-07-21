@@ -35,6 +35,16 @@ export function PositionCard({ positions }: { positions: any[] }) {
           const isWarning = pos.ilRunning > pos.feesCollected;
           const arrowColor = isWarning ? "#E0A82E" : "#38C172";
           const head3Left = rangeLeft + (rangeWidth / 2);
+          
+          const now = Date.now();
+          const createdTime = new Date(pos.createdAt).getTime();
+          const msIn24h = 24 * 60 * 60 * 1000;
+          const msSinceCreated = now - createdTime;
+          const msToNextCollect = msIn24h - (msSinceCreated % msIn24h);
+          const hoursLeft = Math.floor(msToNextCollect / (60 * 60 * 1000));
+          const minsLeft = Math.floor((msToNextCollect % (60 * 60 * 1000)) / (60 * 1000));
+          const secsLeft = Math.floor((msToNextCollect % (60 * 1000)) / 1000);
+          const timeString = `${hoursLeft.toString().padStart(2, '0')}:${minsLeft.toString().padStart(2, '0')}:${secsLeft.toString().padStart(2, '0')}`;
 
           return (
             <article key={pos.id || idx} className={`pos ${isWarning ? 'out' : ''}`}>
@@ -53,7 +63,12 @@ export function PositionCard({ positions }: { positions: any[] }) {
                   Active
                 </span>
               </div>
-              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt}</div>
+              <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>${pos.entryValue} deployed · opened {openedAt}</span>
+                <span style={{ color: (pos.feesCollected + pos.ilRunning) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
+                  PNL: {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${(pos.feesCollected + pos.ilRunning).toFixed(2)}
+                </span>
+              </div>
               
               <div className="arrow">
                 <div className="shaft"></div>
@@ -81,14 +96,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
               </div>
               
               <div className="bars">
-                <div className="bar">
-                  <div className="bk">
-                    <span>NET PNL</span>
-                    <span style={{ color: (pos.feesCollected + pos.ilRunning) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600 }}>
-                      {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${(pos.feesCollected + pos.ilRunning).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
+
                 <div className="bar">
                   <div className="bk"><span>FEES COLLECTED</span><span>${Number(pos.feesCollected || 0).toFixed(2)}</span></div>
                   <div className="bt"><div className="bf" style={{ width: "50%" }}></div></div>
@@ -103,7 +111,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
                 {isWarning ? (
                   <><span className="warn">▶ IL &gt; fee · warning</span> · monitoring · close if persists for 4h</>
                 ) : (
-                  <><span className="ok">▶ fee &gt; IL · compounding</span> · next auto-collect in 00:41:12</>
+                  <><span className="ok">▶ fee &gt; IL · compounding</span> · next auto-collect in {timeString}</>
                 )}
               </div>
               
@@ -139,17 +147,15 @@ export function PositionCard({ positions }: { positions: any[] }) {
               </span>
             </div>
             
-            <div className="pos-meta">Size: {pos.size} · opened {openedAt}</div>
+            <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Size: {pos.size} · opened {openedAt}</span>
+              <span style={{ color: (pos.pnl || 0) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
+                PNL: {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}%
+              </span>
+            </div>
             
             <div className="bars" style={{ marginTop: "12px" }}>
-              <div className="bar">
-                <div className="bk">
-                  <span>NET PNL</span>
-                  <span style={{ color: (pos.pnl || 0) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600 }}>
-                    {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}%
-                  </span>
-                </div>
-              </div>
+
               <div className="bar">
                 <div className="bk"><span>ENTRY PRICE</span><span>{Number(pos.entryPrice).toExponential(4)}</span></div>
               </div>
