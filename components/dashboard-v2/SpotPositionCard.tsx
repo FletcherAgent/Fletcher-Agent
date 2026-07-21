@@ -2,13 +2,13 @@ import React from 'react';
 
 export function SpotPositionCard({ positions }: { positions: any[] }) {
   return (
-    <div className="sect" style={{ marginTop: "1rem" }}>
+    <div className="sect sect-fill" style={{ marginTop: "1rem" }}>
       <div className="sect-head">
         <h2>History Positions</h2>
         <span className="tag" style={{ marginLeft: "auto" }}>Closed & Failed</span>
       </div>
 
-      <div style={{ maxHeight: "600px", overflowY: "auto", paddingRight: "8px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div className="scrollable" style={{ paddingBottom: "12px" }}>
         {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
           No historical positions found.
@@ -43,7 +43,7 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
                 </span>
               </div>
               
-              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt} WIB</div>
+              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt}</div>
               
               <div className="bars" style={{ marginTop: "12px", borderTop: "1px dashed var(--b-3)", paddingTop: "12px" }}>
                 <div className="bar">
@@ -96,7 +96,7 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
                 {pos.status}
               </span>
             </div>
-            <div className="pos-meta">Size: {pos.size} · opened {openedAt} WIB</div>
+            <div className="pos-meta">Size: {pos.size} · opened {openedAt}</div>
             
             <div className="bars" style={{ marginTop: "12px", borderTop: "1px dashed var(--b-3)", paddingTop: "12px" }}>
               <div className="bar">

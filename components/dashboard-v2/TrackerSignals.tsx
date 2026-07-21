@@ -2,11 +2,12 @@ import React from 'react';
 
 export function TrackerSignals({ signals }: { signals: any[] }) {
   return (
-    <div className="sect">
+    <div className="sect sect-fill">
       <div className="sect-head">
         <h2>Tracker signals</h2>
         <span className="tag">LATEST {signals.length}</span>
       </div>
+      <div className="scrollable" style={{ paddingBottom: "12px" }}>
       {signals.length === 0 && (
         <div style={{ padding: '1rem', color: 'var(--mute)' }}>No signals yet.</div>
       )}
@@ -26,6 +27,7 @@ export function TrackerSignals({ signals }: { signals: any[] }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

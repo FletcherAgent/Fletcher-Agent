@@ -53,7 +53,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
                   Active
                 </span>
               </div>
-              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt} WIB</div>
+              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt}</div>
               
               <div className="arrow">
                 <div className="shaft"></div>
@@ -131,7 +131,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
               </span>
             </div>
             
-            <div className="pos-meta">Size: {pos.size} · opened {openedAt} WIB</div>
+            <div className="pos-meta">Size: {pos.size} · opened {openedAt}</div>
             
             <div className="bars" style={{ marginTop: "12px" }}>
               <div className="bar">

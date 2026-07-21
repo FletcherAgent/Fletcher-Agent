@@ -43,9 +43,14 @@
 
 /* ---------- grid ---------- */
 .wrap{display:grid;grid-template-columns:320px 1fr 320px;gap:1px;background:var(--line);min-height:calc(100vh - 54px - 40px);max-width:none;margin:0}
-.col{background:var(--bg);padding:18px 20px}
+.col{background:var(--bg);padding:18px 20px;display:flex;flex-direction:column;overflow:hidden;}
 
 .sect{margin-bottom:26px}
+.sect-fill{flex:1;display:flex;flex-direction:column;overflow:hidden;margin-bottom:0;}
+.scrollable{flex:1;overflow-y:auto;padding-right:4px;}
+.scrollable::-webkit-scrollbar{width:4px}
+.scrollable::-webkit-scrollbar-thumb{background:var(--line)}
+
 .sect-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
 .sect-head h2{font-family:var(--serif);font-weight:400;font-size:17px;color:var(--parch)}
 .sect-head .tag{font-size:10px;letter-spacing:1.5px;color:var(--mut)}
