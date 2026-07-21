@@ -31,10 +31,13 @@ export function PositionCard({ positions }: { positions: any[] }) {
           let rangeLeft = ((pos.tickLower - MIN_TICK) / totalTickRange) * 100;
           let rangeWidth = ((pos.tickUpper - pos.tickLower) / totalTickRange) * 100;
           
-          rangeLeft = Math.max(0, Math.min(98, rangeLeft));
-          rangeWidth = Math.max(2, Math.min(100 - rangeLeft, rangeWidth));
+          // Clamp values to ensure UI doesn't break and text doesn't overlap
+          rangeLeft = Math.max(0, Math.min(80, rangeLeft));
+          rangeWidth = Math.max(20, Math.min(100 - rangeLeft, rangeWidth)); // Minimum 20% width to prevent text overlap
+          
           const isWarning = pos.ilRunning > pos.feesCollected;
           const arrowColor = isWarning ? "#E0A82E" : "#38C172";
+          const isFullRange = pos.tickLower < -800000;
           const head3Left = rangeLeft + (rangeWidth / 2);
           
           const now = Date.now();
@@ -83,7 +86,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
                 <div className="head" style={{ left: `${head3Left}%` }}>
                   <svg width="14" height="16" viewBox="0 0 14 16"><path d="M7 0 L14 8 L7 16 L7 11 L0 11 L0 5 L7 5 Z" fill="#E9E4D6"/></svg>
                 </div>
-                {rangeWidth > 90 ? (
+                {isFullRange ? (
                   <>
                     <span className="rl" style={{ left: "2%" }}>FULL</span>
                     <span className="rl" style={{ left: "93%" }}>RANGE</span>
@@ -91,7 +94,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
                 ) : (
                   <>
                     <span className="rl" style={{ left: `${rangeLeft}%` }}>{pos.tickLower}</span>
-                    <span className="rl" style={{ left: `${rangeLeft + rangeWidth - 4}%` }}>{pos.tickUpper}</span>
+                    <span className="rl" style={{ left: `calc(${rangeLeft + rangeWidth}% - 10px)` }}>{pos.tickUpper}</span>
                   </>
                 )}
               </div>
