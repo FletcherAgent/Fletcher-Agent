@@ -79,7 +79,7 @@ export default function DashboardV2() {
 
         {/* MIDDLE: positions */}
         <section className="col">
-          <StatStrip metrics={data?.metrics} lpPositions={rawLp} />
+          <StatStrip metrics={data?.metrics} lpPositions={rawLp} spotPositions={rawSpot} />
           <PositionCard positions={openPositions} />
           <SpotPositionCard positions={historyPositions} />
         </section>

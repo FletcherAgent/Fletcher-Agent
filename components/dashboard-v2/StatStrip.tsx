@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPositions?: any[] }) {
+export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { metrics?: any, lpPositions?: any[], spotPositions?: any[] }) {
   // Calculate dynamic totals from lpPositions
   const activePositions = lpPositions.filter(p => p.status === 'OPEN' || !p.status);
   
@@ -25,9 +25,34 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
   const activeCount = activePositions.length;
 
   const cap = metrics?.maxPositionSize || 2000;
+
+  // Spot Stats
+  let spotDeployed = 0;
+  let spotActiveCount = 0;
+  let spotWinCount = 0;
+  let spotClosedCount = 0;
+  let spotAllTimePnl = 0;
+
+  spotPositions.forEach(pos => {
+    if (pos.status === 'OPEN') {
+      spotDeployed += pos.size || 0;
+      spotActiveCount++;
+    } else if (pos.status === 'CLOSED' || pos.status === 'FAILED' || pos.status === 'EXIT_FAILED' || pos.status === 'EXITING') {
+      if (pos.status === 'CLOSED') {
+        spotClosedCount++;
+        if (pos.pnl && pos.pnl > 0) spotWinCount++;
+      }
+      if (pos.pnl) {
+        spotAllTimePnl += (pos.size || 0) * pos.pnl;
+      }
+    }
+  });
+
+  const spotWinRate = spotClosedCount > 0 ? ((spotWinCount / spotClosedCount) * 100).toFixed(1) : '0.0';
   
   return (
-    <div className="strip">
+    <>
+    <div className="strip" style={{ marginBottom: '12px' }}>
       <div className="stat">
         <div className="k">TOTAL DEPLOYED</div>
         <div className="v">${totalDeployed.toFixed(2)}</div>
@@ -49,5 +74,28 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
         <div className="sub">{isHealthy ? 'fee > IL · hold' : 'IL > fee · warning'}</div>
       </div>
     </div>
+    <div className="strip">
+      <div className="stat">
+        <div className="k">SPOT DEPLOYED</div>
+        <div className="v">{spotDeployed.toFixed(3)}</div>
+        <div className="sub">{spotActiveCount} active positions</div>
+      </div>
+      <div className="stat">
+        <div className="k">SPOT PNL (ALL TIME)</div>
+        <div className="v"><span className={spotAllTimePnl >= 0 ? "up" : "down"}>{spotAllTimePnl >= 0 ? '+' : ''}{spotAllTimePnl.toFixed(3)}</span></div>
+        <div className="sub">Alpha & Copytrade</div>
+      </div>
+      <div className="stat">
+        <div className="k">SPOT WIN RATE</div>
+        <div className="v">{spotWinRate}%</div>
+        <div className="sub">{spotWinCount} / {spotClosedCount} closed trades</div>
+      </div>
+      <div className="stat">
+        <div className="k">MODES</div>
+        <div className="v">ACTIVE</div>
+        <div className="sub">Scout · Copytrade · Alpha</div>
+      </div>
+    </div>
+    </>
   );
 }
