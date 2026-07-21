@@ -2,11 +2,13 @@ import React from 'react';
 
 export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPositions?: any[] }) {
   // Calculate dynamic totals from lpPositions
+  const activePositions = lpPositions.filter(p => p.status === 'OPEN' || !p.status);
+  
   let totalFees = 0;
   let totalIl = 0;
   let totalDeployed = 0;
   
-  lpPositions.forEach(pos => {
+  activePositions.forEach(pos => {
     totalFees += pos.feesCollected || 0;
     totalIl += pos.ilRunning || 0;
     totalDeployed += pos.entryValue || 0;
@@ -14,7 +16,7 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
 
   const feeVsIlRatio = totalIl > 0 ? (totalFees / totalIl).toFixed(1) : (totalFees > 0 ? 'MAX' : '0.0');
   const isHealthy = totalFees >= totalIl;
-  const activeCount = lpPositions.length;
+  const activeCount = activePositions.length;
 
   const cap = metrics?.maxPositionSize || 2000;
   
