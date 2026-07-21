@@ -7,11 +7,16 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
   let totalFees = 0;
   let totalIl = 0;
   let totalDeployed = 0;
+  let allTimeHarvested = 0;
   
   activePositions.forEach(pos => {
     totalFees += pos.feesCollected || 0;
     totalIl += pos.ilRunning || 0;
     totalDeployed += pos.entryValue || 0;
+  });
+
+  lpPositions.forEach(pos => {
+    allTimeHarvested += pos.feesCollected || 0;
   });
 
   const absIl = Math.abs(totalIl);
@@ -35,7 +40,7 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
       </div>
       <div className="stat">
         <div className="k">HARVESTED (ALL TIME)</div>
-        <div className="v">${totalFees.toFixed(2)}</div>
+        <div className="v">${allTimeHarvested.toFixed(2)}</div>
         <div className="sub">above ${cap >= 1000 ? `${cap/1000}K` : cap}/position cap</div>
       </div>
       <div className="stat">
