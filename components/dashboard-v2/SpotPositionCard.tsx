@@ -2,13 +2,13 @@ import React from 'react';
 
 export function SpotPositionCard({ positions }: { positions: any[] }) {
   return (
-    <div className="sect sect-fill" style={{ marginTop: "1rem" }}>
+    <div className="sect" style={{ marginTop: "1rem" }}>
       <div className="sect-head">
         <h2>History Positions</h2>
         <span className="tag" style={{ marginLeft: "auto" }}>Closed & Failed</span>
       </div>
 
-      <div className="scrollable" style={{ paddingBottom: "12px" }}>
+      <div className="scrollable" style={{ paddingBottom: "12px", maxHeight: "1070px" }}>
         {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
           No historical positions found.

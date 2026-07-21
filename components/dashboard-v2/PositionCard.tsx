@@ -82,6 +82,14 @@ export function PositionCard({ positions }: { positions: any[] }) {
               
               <div className="bars">
                 <div className="bar">
+                  <div className="bk">
+                    <span>NET PNL</span>
+                    <span style={{ color: (pos.feesCollected + pos.ilRunning) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600 }}>
+                      {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${(pos.feesCollected + pos.ilRunning).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="bar">
                   <div className="bk"><span>FEES COLLECTED</span><span>${Number(pos.feesCollected || 0).toFixed(2)}</span></div>
                   <div className="bt"><div className="bf" style={{ width: "50%" }}></div></div>
                 </div>
@@ -134,6 +142,14 @@ export function PositionCard({ positions }: { positions: any[] }) {
             <div className="pos-meta">Size: {pos.size} · opened {openedAt}</div>
             
             <div className="bars" style={{ marginTop: "12px" }}>
+              <div className="bar">
+                <div className="bk">
+                  <span>NET PNL</span>
+                  <span style={{ color: (pos.pnl || 0) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600 }}>
+                    {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}%
+                  </span>
+                </div>
+              </div>
               <div className="bar">
                 <div className="bk"><span>ENTRY PRICE</span><span>{Number(pos.entryPrice).toExponential(4)}</span></div>
               </div>

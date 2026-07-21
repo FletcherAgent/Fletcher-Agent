@@ -69,7 +69,7 @@ export default function DashboardV2() {
 
   return (
     <div className="dashboard-v2-container">
-      <Topbar blk={blk} />
+      <Topbar blk={blk} tradingMode={data?.metrics?.tradingMode} />
 
       <main className="wrap">
         {/* LEFT: Agent Log */}

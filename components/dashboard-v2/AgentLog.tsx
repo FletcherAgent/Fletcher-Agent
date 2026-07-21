@@ -6,7 +6,7 @@ interface AgentLogProps {
 
 export function AgentLog({ logs }: AgentLogProps) {
   return (
-    <div className="sect">
+    <div className="sect sect-fill">
       <div className="sect-head">
         <h2>Agent log</h2>
         <span className="tag live">STREAMING</span>

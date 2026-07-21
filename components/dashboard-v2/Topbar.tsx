@@ -2,9 +2,10 @@ import React from 'react';
 
 interface TopbarProps {
   blk: number;
+  tradingMode?: string;
 }
 
-export function Topbar({ blk }: TopbarProps) {
+export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
   return (
     <header className="topbar">
       <div className="wordmark">
@@ -19,9 +20,9 @@ export function Topbar({ blk }: TopbarProps) {
       </div>
       <div className="spacer"></div>
       <div className="modes" role="tablist" aria-label="Autonomy mode">
-        <button role="tab" aria-selected="false">MANUAL</button>
-        <button role="tab" aria-selected="true" className="on">SEMI</button>
-        <button role="tab" aria-selected="false">FULL</button>
+        <button role="tab" aria-selected={tradingMode === 'MANUAL'} className={tradingMode === 'MANUAL' ? 'on' : ''}>MANUAL</button>
+        <button role="tab" aria-selected={tradingMode === 'SEMI'} className={tradingMode === 'SEMI' ? 'on' : ''}>SEMI</button>
+        <button role="tab" aria-selected={tradingMode === 'FULL'} className={tradingMode === 'FULL' ? 'on' : ''}>FULL</button>
       </div>
       <div className="tier">TIER 2 · 2.4M $FLETCH</div>
       <div className="addr">0x7e3B…a3ad</div>

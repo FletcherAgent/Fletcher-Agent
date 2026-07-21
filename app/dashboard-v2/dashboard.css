@@ -42,7 +42,7 @@
 .addr{font-size:11px;color:var(--mut)}
 
 /* ---------- grid ---------- */
-.wrap{display:grid;grid-template-columns:320px 1fr 320px;gap:1px;background:var(--line);min-height:calc(100vh - 54px - 40px);max-width:none;margin:0}
+.wrap{display:grid;grid-template-columns:320px 1fr 320px;gap:1px;background:var(--line);min-height:calc(100vh - 94px);max-width:none;margin:0}
 .col{background:var(--bg);padding:18px 20px;display:flex;flex-direction:column;overflow:hidden;}
 
 .sect{margin-bottom:26px}
@@ -116,7 +116,7 @@
 .v2-sig .chase{color:var(--amber)}
 
 /* ---------- log ---------- */
-.log{background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:12px 14px;height:calc(100vh - 160px);overflow-y:auto;font-size:11px}
+.log{background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:12px 14px;flex:1;overflow-y:auto;font-size:11px}
 .log::-webkit-scrollbar{width:4px}
 .log::-webkit-scrollbar-thumb{background:var(--line)}
 .ln{margin-bottom:5px;color:var(--mut)}
