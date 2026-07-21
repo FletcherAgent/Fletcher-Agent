@@ -53,6 +53,20 @@ export default function DashboardV2() {
     };
   }, []);
 
+  // Compute combined open and history positions
+  const rawLp = data?.lpPositions || [];
+  const rawSpot = data?.positions || [];
+
+  const openPositions = [
+    ...rawLp.filter(p => p.status === 'OPEN' || !p.status).map(p => ({ ...p, _type: 'LP' })),
+    ...rawSpot.filter(p => p.status === 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const historyPositions = [
+    ...rawLp.filter(p => p.status === 'CLOSED' || p.status === 'FAILED').map(p => ({ ...p, _type: 'LP' })),
+    ...rawSpot.filter(p => p.status !== 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
   return (
     <div className="dashboard-v2-container">
       <Topbar blk={blk} />
@@ -65,9 +79,9 @@ export default function DashboardV2() {
 
         {/* MIDDLE: positions */}
         <section className="col">
-          <StatStrip metrics={data?.metrics} lpPositions={data?.lpPositions || []} />
-          <PositionCard lpPositions={data?.lpPositions || []} />
-          <SpotPositionCard positions={data?.positions || []} />
+          <StatStrip metrics={data?.metrics} lpPositions={rawLp} />
+          <PositionCard positions={openPositions} />
+          <SpotPositionCard positions={historyPositions} />
         </section>
 
         {/* RIGHT: screening + signals */}

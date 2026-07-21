@@ -4,28 +4,66 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
   return (
     <div className="sect" style={{ marginTop: "1rem" }}>
       <div className="sect-head">
-        <h2>Spot & Trench Positions</h2>
-        <span className="tag" style={{ marginLeft: "auto" }}>History & Active</span>
+        <h2>History Positions</h2>
+        <span className="tag" style={{ marginLeft: "auto" }}>Closed & Failed</span>
       </div>
 
       {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
-          No spot positions currently.
+          No historical positions found.
         </div>
       )}
 
       {positions.map((pos: any, idx: number) => {
         const openedAt = new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const isClosed = pos.status === 'CLOSED';
-        const isFailed = pos.status === 'EXIT_FAILED';
-        const isOpen = pos.status === 'OPEN';
+        const isFailed = pos.status === 'EXIT_FAILED' || pos.status === 'FAILED';
         
         let statusColor = "var(--amber)";
         if (isClosed) statusColor = "var(--mute)";
         if (isFailed) statusColor = "var(--red)";
-        if (isOpen) statusColor = "var(--green)";
 
-        // Formatting PNL
+        // LP POSITION HISTORY
+        if (pos._type === 'LP') {
+          const pair = `${pos.token0Symbol || 'TKN0'} / ${pos.token1Symbol || 'TKN1'}`;
+          
+          return (
+            <article key={pos.id || idx} className={`pos ${isFailed ? 'out' : ''}`}>
+              <div className="pos-top">
+                <span className="pair">{pair}</span>
+                <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[LP]</span>
+                {pos.source === 'ALPHA' && (
+                  <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
+                    [ALPHA]
+                  </span>
+                )}
+                <span className="apr" style={{ color: statusColor }}>
+                  {pos.status}
+                </span>
+              </div>
+              
+              <div className="pos-meta">${pos.entryValue} deployed · opened {openedAt} WIB</div>
+              
+              <div className="bars" style={{ marginTop: "12px", borderTop: "1px dashed var(--b-3)", paddingTop: "12px" }}>
+                <div className="bar">
+                  <div className="bk"><span>FEES EARNED</span><span>${Number(pos.feesCollected || 0).toFixed(2)}</span></div>
+                </div>
+              </div>
+              
+              <div className="verdict" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
+                <div>
+                  {isClosed && <><span className="warn">▶ CLOSED</span></>}
+                  {isFailed && <span className="warn">▶ FAILED</span>}
+                </div>
+                <div style={{ fontWeight: 'bold', color: pos.ilRunning > 0 ? "var(--red)" : "var(--green)" }}>
+                  IL: ${Number(pos.ilRunning || 0).toFixed(2)}
+                </div>
+              </div>
+            </article>
+          );
+        }
+
+        // SPOT/TRENCH POSITION HISTORY
         let pnlText = "N/A";
         let pnlColor = "var(--mute)";
         if (pos.pnl !== null) {
@@ -39,17 +77,18 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
           <article key={pos.id || idx} className={`pos ${isFailed ? 'out' : ''}`}>
             <div className="pos-top">
               <span className="pair">{pos.tokenSymbol || 'TKN'}</span>
+              <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[SPOT]</span>
               <span className={`mode-b day`}>
                 {pos.tradingMode}
               </span>
               {pos.source === 'ALPHA' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
-                  ★ ALPHA
+                  [ALPHA]
                 </span>
               )}
               {pos.source === 'COPYTRADE' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#2563EB", color: "#fff" }}>
-                  📋 COPY
+                  [COPY]
                 </span>
               )}
               <span className="apr" style={{ color: statusColor }}>
@@ -71,18 +110,11 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
               <div>
                 {isClosed && <><span className="warn">▶ EXIT REASON:</span> {pos.exitReason || 'Manual'}</>}
                 {isFailed && <span className="warn">▶ EXIT FAILED</span>}
-                {isOpen && <span className="ok">▶ POSITION OPEN</span>}
               </div>
               <div style={{ fontWeight: 'bold', color: pnlColor }}>
                 PNL: {pnlText}
               </div>
             </div>
-            
-            {isOpen && (
-              <div className="pos-actions">
-                <button>CLOSE POSITION</button>
-              </div>
-            )}
           </article>
         );
       })}
