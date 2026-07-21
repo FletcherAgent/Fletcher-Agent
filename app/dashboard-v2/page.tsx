@@ -7,6 +7,7 @@ import "./dashboard.css"; // Import the CSS module
 import { Topbar } from "../../components/dashboard-v2/Topbar";
 import { StatStrip } from "../../components/dashboard-v2/StatStrip";
 import { PositionCard } from "../../components/dashboard-v2/PositionCard";
+import { SpotPositionCard } from "../../components/dashboard-v2/SpotPositionCard";
 import { ScreeningFeed } from "../../components/dashboard-v2/ScreeningFeed";
 import { TrackerSignals } from "../../components/dashboard-v2/TrackerSignals";
 import { AgentLog } from "../../components/dashboard-v2/AgentLog";
@@ -66,6 +67,7 @@ export default function DashboardV2() {
         <section className="col">
           <StatStrip metrics={data?.metrics} lpPositions={data?.lpPositions || []} />
           <PositionCard lpPositions={data?.lpPositions || []} />
+          <SpotPositionCard positions={data?.positions || []} />
         </section>
 
         {/* RIGHT: screening + signals */}
