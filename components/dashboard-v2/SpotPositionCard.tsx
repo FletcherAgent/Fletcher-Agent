@@ -80,8 +80,13 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
                     </span>
                   )}
                 </div>
-                <div style={{ fontWeight: 'bold', color: pos.ilRunning < 0 ? "var(--red)" : "var(--green)" }}>
-                  IL: ${Number(pos.ilRunning || 0).toFixed(2)}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                  <div style={{ fontWeight: 'bold', color: (Number(pos.feesCollected || 0) + Number(pos.ilRunning || 0)) >= 0 ? "var(--green)" : "var(--red)" }}>
+                    PNL: {((Number(pos.feesCollected || 0) + Number(pos.ilRunning || 0)) >= 0 ? '+' : '')}${(Number(pos.feesCollected || 0) + Number(pos.ilRunning || 0)).toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: '11px', color: pos.ilRunning < 0 ? "var(--red)" : "var(--green)" }}>
+                    IL: ${Number(pos.ilRunning || 0).toFixed(2)}
+                  </div>
                 </div>
               </div>
             </article>
