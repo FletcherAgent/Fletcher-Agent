@@ -65,7 +65,7 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
       </div>
       <div className="stat">
         <div className="k">HARVESTED (ALL TIME)</div>
-        <div className="v">${allTimeHarvested.toFixed(2)}</div>
+        <div className="v"><span className={allTimeHarvested > 0 ? "up" : ""}>{allTimeHarvested > 0 ? '+' : ''}${allTimeHarvested.toFixed(2)}</span></div>
         <div className="sub">above ${cap >= 1000 ? `${cap/1000}K` : cap}/position cap</div>
       </div>
       <div className="stat">
