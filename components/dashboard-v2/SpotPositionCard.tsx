@@ -8,7 +8,8 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
         <span className="tag" style={{ marginLeft: "auto" }}>Closed & Failed</span>
       </div>
 
-      {positions.length === 0 && (
+      <div style={{ maxHeight: "600px", overflowY: "auto", paddingRight: "8px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        {positions.length === 0 && (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--mute)' }}>
           No historical positions found.
         </div>
@@ -118,6 +119,7 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
           </article>
         );
       })}
+      </div>
     </div>
   );
 }
