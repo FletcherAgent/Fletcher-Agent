@@ -14,8 +14,9 @@ export function StatStrip({ metrics, lpPositions = [] }: { metrics?: any, lpPosi
     totalDeployed += pos.entryValue || 0;
   });
 
-  const feeVsIlRatio = totalIl > 0 ? (totalFees / totalIl).toFixed(1) : (totalFees > 0 ? 'MAX' : '0.0');
-  const isHealthy = totalFees >= totalIl;
+  const absIl = Math.abs(totalIl);
+  const feeVsIlRatio = absIl > 0 ? (totalFees / absIl).toFixed(1) : (totalFees > 0 ? 'MAX' : '0.0');
+  const isHealthy = totalFees >= absIl;
   const activeCount = activePositions.length;
 
   const cap = metrics?.maxPositionSize || 2000;
