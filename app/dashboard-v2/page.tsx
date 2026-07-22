@@ -31,7 +31,10 @@ export default function DashboardV2() {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await fetch(`${apiUrl}/api/dashboard`);
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+        const res = await fetch(`${apiUrl}/api/dashboard`, {
+          headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
         const json = await res.json();
         setData(json);
       } catch (err) {

@@ -11,7 +11,10 @@ export default function Mind() {
     const fetchMindData = async () => {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://fletcher-core-production-d4b8.up.railway.app";
       try {
-        const res = await fetch(`${API_URL}/api/dashboard`);
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+        const res = await fetch(`${API_URL}/api/dashboard`, {
+          headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setLogs(data.logs || []);

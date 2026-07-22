@@ -17,9 +17,13 @@ export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN" }: Topb
     setMode(newMode); // Optimistic UI update
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
       await fetch(`${apiUrl}/api/settings/mode`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ mode: newMode })
       });
     } catch (err) {
