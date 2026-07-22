@@ -95,7 +95,7 @@
 .verdict{margin-top:10px;font-size:11px}
 .verdict .ok{color:var(--green)}
 .verdict .warn{color:var(--amber)}
-.pos-actions{position:absolute;top:12px;right:14px;display:none;gap:6px}
+.pos-actions{position:absolute;top:12px;right:14px;display:none;gap:6px;background:var(--panel);padding-left:10px;z-index:5}
 .pos:hover .pos-actions{display:flex}
 .pos-actions button{background:transparent;border:1px solid var(--line);color:var(--mut);font-family:var(--mono);font-size:10px;padding:3px 8px;cursor:pointer;border-radius:2px}
 .pos-actions button:hover{color:var(--parch);border-color:var(--mut)}

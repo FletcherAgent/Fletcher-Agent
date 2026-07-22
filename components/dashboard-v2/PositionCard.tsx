@@ -17,7 +17,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
       )}
 
       {positions.map((pos: any, idx: number) => {
-        const openedAt = new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const openedAt = pos.createdAt ? new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB' : '00:00';
 
         // --- LP POSITION RENDER ---
         if (pos._type === 'LP') {
@@ -50,6 +50,13 @@ export function PositionCard({ positions }: { positions: any[] }) {
           const secsLeft = Math.floor((msToNextCollect % (60 * 1000)) / 1000);
           const timeString = `${hoursLeft.toString().padStart(2, '0')}:${minsLeft.toString().padStart(2, '0')}:${secsLeft.toString().padStart(2, '0')}`;
 
+          const entryValue = pos.entryValue || 1;
+          const feesWidth = Math.min(100, Math.max(0, ((pos.feesCollected || 0) / entryValue) * 100));
+          const ilWidth = Math.min(100, Math.max(0, (Math.abs(pos.ilRunning || 0) / entryValue) * 100));
+          
+          const daysOpen = pos.createdAt ? Math.max(0.1, (now - new Date(pos.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0.1;
+          const feeEarnedPct = ((pos.feesCollected || 0) / entryValue) * 100;
+
           return (
             <article key={pos.id || idx} className={`pos ${isWarning ? 'out' : ''}`}>
               <div className="pos-top">
@@ -80,7 +87,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
                 </span>
               </div>
               <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>${pos.entryValue} deployed · opened {openedAt}</span>
+                <span>${pos.entryValue} deployed · opened {openedAt} · {Math.floor(daysOpen)}d ago · {feeEarnedPct.toFixed(2)}% fees</span>
                 <span style={{ color: (pos.feesCollected + pos.ilRunning) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
                   PNL: {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${(pos.feesCollected + pos.ilRunning).toFixed(2)}
                 </span>
@@ -115,11 +122,11 @@ export function PositionCard({ positions }: { positions: any[] }) {
 
                 <div className="bar">
                   <div className="bk"><span>FEES COLLECTED</span><span>${Number(pos.feesCollected || 0).toFixed(2)}</span></div>
-                  <div className="bt"><div className="bf" style={{ width: "50%" }}></div></div>
+                  <div className="bt"><div className="bf" style={{ width: `${feesWidth}%` }}></div></div>
                 </div>
                 <div className="bar il">
-                  <div className="bk"><span>IL ESTIMATE</span><span>${Number(pos.ilRunning || 0).toFixed(2)}</span></div>
-                  <div className="bt"><div className="bf" style={{ width: "15%" }}></div></div>
+                  <div className="bk"><span>IL ESTIMATE</span><span>{pos.ilRunning === 0 ? "n/a (no IL yet)" : `$${Number(pos.ilRunning || 0).toFixed(2)}`}</span></div>
+                  <div className="bt"><div className="bf" style={{ width: `${ilWidth}%` }}></div></div>
                 </div>
               </div>
               
