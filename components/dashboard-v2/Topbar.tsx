@@ -4,9 +4,10 @@ interface TopbarProps {
   blk: number;
   tradingMode?: string;
   dataMode?: string;
+  onToggleDataMode?: () => void;
 }
 
-export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN" }: TopbarProps) {
+export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN", onToggleDataMode }: TopbarProps) {
   const [mode, setMode] = useState(tradingMode);
 
   useEffect(() => {
@@ -51,8 +52,17 @@ export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN" }: Topb
         <button onClick={() => handleModeChange('FULL')} role="tab" aria-selected={mode === 'FULL'} className={mode === 'FULL' ? 'on' : ''}>FULL</button>
       </div>
       <div className="spacer"></div>
-      <div className={`chainpill ${dataMode === 'LIVE' ? 'live-mode' : 'dry-mode'}`} style={{ fontWeight: 'bold', background: dataMode === 'LIVE' ? 'var(--green)' : '#2563EB', color: dataMode === 'LIVE' ? '#000' : '#fff', padding: '4px 10px' }}>
-        {dataMode}
+      <div 
+        onClick={onToggleDataMode}
+        className={`chainpill ${dataMode === 'LIVE' ? 'live-mode' : 'dry-mode'}`} 
+        style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 'bold', background: dataMode === 'LIVE' ? 'var(--green)' : '#2563EB', color: dataMode === 'LIVE' ? '#000' : '#fff', padding: '4px 10px' }}>
+        <span>{dataMode}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="17 1 21 5 17 9"></polyline>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+          <polyline points="7 23 3 19 7 15"></polyline>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+        </svg>
       </div>
       <div className="tier">TIER 2 · 2.4M $FLETCH</div>
       <div className="addr">0x7e3B…a3ad</div>
