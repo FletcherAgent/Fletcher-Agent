@@ -24,6 +24,17 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
   const isHealthy = totalFees >= absIl;
   const activeCount = activePositions.length;
 
+  let lpClosedCount = 0;
+  let lpWinCount = 0;
+  lpPositions.forEach(pos => {
+    if (pos.status === 'CLOSED') {
+      lpClosedCount++;
+      const net = (pos.feesCollected || 0) + (pos.ilRunning || 0);
+      if (net > 0) lpWinCount++;
+    }
+  });
+  const lpWinRate = lpClosedCount > 0 ? ((lpWinCount / lpClosedCount) * 100).toFixed(1) : '0.0';
+
   const cap = metrics?.maxPositionSize || 2000;
 
   // Spot Stats
@@ -52,7 +63,7 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
   
   return (
     <>
-    <div className="strip" style={{ marginBottom: '12px' }}>
+    <div className="strip strip-5" style={{ marginBottom: '12px' }}>
       <div className="stat">
         <div className="k">TOTAL DEPLOYED</div>
         <div className="v">${totalDeployed.toFixed(2)}</div>
@@ -72,6 +83,11 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
         <div className="k">FEE vs IL (24H)</div>
         <div className="v"><span className={isHealthy ? "up" : ""}>{feeVsIlRatio}×</span></div>
         <div className="sub">{isHealthy ? 'fee > IL · hold' : 'IL > fee · warning'}</div>
+      </div>
+      <div className="stat">
+        <div className="k">LP WIN RATE</div>
+        <div className="v">{lpWinRate}%</div>
+        <div className="sub">{lpWinCount} / {lpClosedCount} closed LPs</div>
       </div>
     </div>
     <div className="strip">

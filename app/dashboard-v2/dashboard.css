@@ -58,6 +58,7 @@
 
 /* ---------- stat strip ---------- */
 .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:24px}
+.strip-5{grid-template-columns:repeat(5,1fr)}
 .stat{background:var(--panel-2);padding:12px 14px}
 .stat .k{font-size:10px;letter-spacing:1.2px;color:var(--mut);margin-bottom:4px}
 .stat .v{font-size:19px;color:var(--parch)}
@@ -133,7 +134,7 @@
 
 @media (max-width:900px){
   .wrap{grid-template-columns:1fr}
-  .strip{grid-template-columns:repeat(2,1fr)}
+  .strip, .strip-5{grid-template-columns:repeat(2,1fr)}
   .topbar{flex-wrap:wrap;height:auto;padding:10px 14px;gap:10px}
 }
 @media (prefers-reduced-motion: reduce){
