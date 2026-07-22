@@ -170,6 +170,25 @@ export default function Hero() {
       <canvas id="binfield"></canvas>
 
       <div className="hero-copy">
+        {process.env.NEXT_PUBLIC_CA && process.env.NEXT_PUBLIC_CA.trim() !== "" && (
+          <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-start' }}>
+            <span style={{ 
+              background: 'rgba(43, 255, 91, 0.1)', 
+              padding: '8px 16px', 
+              borderRadius: '24px', 
+              border: '1px solid rgba(43, 255, 91, 0.3)', 
+              color: '#2bff5b', 
+              fontSize: '14px', 
+              letterSpacing: '1px', 
+              fontFamily: 'monospace',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}>CA:</span> {process.env.NEXT_PUBLIC_CA.trim()}
+            </span>
+          </div>
+        )}
         <h1>AUTONOMOUS LIQUIDITY ON ROBINHOOD CHAIN</h1>
         <p className="hero-sub">
           Fletcher manages concentrated liquidity positions on its own: screening pairs, deploying ranges, compounding fees, and exiting when impermanent loss outruns yield. Sniping and smart-money copy-trading ride on top. You hold the keys the entire time.
