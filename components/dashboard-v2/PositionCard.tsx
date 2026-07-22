@@ -65,6 +65,9 @@ export function PositionCard({ positions }: { positions: any[] }) {
                 <span className={`mode-b ${isNight ? 'night' : 'day'}`}>
                   {isNight ? 'NIGHT · SPRAY' : 'DAY · FULL RANGE'}
                 </span>
+                <span className="tag" style={{ marginLeft: "8px", background: "#333", color: "#ddd" }}>
+                  v3 · {pos.feeTier / 10000}%
+                </span>
                 {pos.source === 'ALPHA' && (
                   <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
                     [ALPHA]
@@ -183,7 +186,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
             </div>
             
             <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Size: {pos.size} · opened {openedAt}</span>
+              <span>Size: {pos.size} · opened {openedAt} · Avg R-multiple: {(pos.rMultiple || 0).toFixed(1)}R</span>
               <span style={{ color: (pos.pnl || 0) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
                 PNL: {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}%
               </span>
