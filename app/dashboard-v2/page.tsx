@@ -26,6 +26,8 @@ export default function DashboardV2() {
     metrics: any;
   } | null>(null);
 
+  const [viewDataMode, setViewDataMode] = useState<'LIVE' | 'DRY_RUN'>('LIVE');
+
   useEffect(() => {
     // Fetch real data from backend
     const fetchData = async () => {
@@ -60,23 +62,28 @@ export default function DashboardV2() {
   const rawLp = data?.lpPositions || [];
   const rawSpot = data?.positions || [];
 
+  // Filter based on viewDataMode
+  const filteredLp = rawLp.filter(p => (p.tradingMode || 'LIVE') === viewDataMode);
+  const filteredSpot = rawSpot.filter(p => (p.tradingMode || 'LIVE') === viewDataMode);
+
   const openPositions = [
-    ...rawLp.filter(p => p.status === 'OPEN' || !p.status).map(p => ({ ...p, _type: 'LP' })),
-    ...rawSpot.filter(p => p.status === 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
+    ...filteredLp.filter(p => p.status === 'OPEN' || !p.status).map(p => ({ ...p, _type: 'LP' })),
+    ...filteredSpot.filter(p => p.status === 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const historyPositions = [
-    ...rawLp.filter(p => p.status !== 'OPEN' && p.status !== 'PENDING').map(p => ({ ...p, _type: 'LP' })),
-    ...rawSpot.filter(p => p.status !== 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
+    ...filteredLp.filter(p => p.status !== 'OPEN' && p.status !== 'PENDING').map(p => ({ ...p, _type: 'LP' })),
+    ...filteredSpot.filter(p => p.status !== 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-  // Determine global data mode (if any position is DRY_RUN, it's DRY_RUN, else LIVE)
-  const isDryRun = openPositions.some(p => p.tradingMode === 'DRY_RUN') || historyPositions.some(p => p.tradingMode === 'DRY_RUN');
-  const dataMode = isDryRun ? 'DRY_RUN' : 'LIVE';
 
   return (
     <div className="dashboard-v2-container">
-      <Topbar blk={blk} tradingMode={data?.metrics?.tradingMode} dataMode={dataMode} />
+      <Topbar 
+        blk={blk} 
+        tradingMode={data?.metrics?.autonomyMode} 
+        dataMode={viewDataMode} 
+        onToggleDataMode={() => setViewDataMode(prev => prev === 'LIVE' ? 'DRY_RUN' : 'LIVE')} 
+      />
 
       <main className="wrap">
         {/* LEFT: Agent Log */}
@@ -86,7 +93,7 @@ export default function DashboardV2() {
 
         {/* MIDDLE: positions */}
         <section className="col">
-          <StatStrip metrics={data?.metrics} lpPositions={rawLp} spotPositions={rawSpot} />
+          <StatStrip metrics={data?.metrics} lpPositions={filteredLp} spotPositions={filteredSpot} />
           <PositionCard positions={openPositions} />
           <SpotPositionCard positions={historyPositions} />
         </section>
