@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface TopbarProps {
   blk: number;
@@ -6,6 +6,27 @@ interface TopbarProps {
 }
 
 export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
+  const [mode, setMode] = useState(tradingMode);
+
+  useEffect(() => {
+    setMode(tradingMode);
+  }, [tradingMode]);
+
+  const handleModeChange = async (newMode: string) => {
+    setMode(newMode); // Optimistic UI update
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      await fetch(`${apiUrl}/api/settings/mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: newMode })
+      });
+    } catch (err) {
+      console.error('Failed to update mode', err);
+      setMode(tradingMode); // Revert on failure
+    }
+  };
+
   return (
     <header className="topbar">
       <div className="wordmark">
@@ -20,9 +41,9 @@ export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
       </div>
       <div className="spacer"></div>
       <div className="modes" role="tablist" aria-label="Autonomy mode">
-        <button role="tab" aria-selected={tradingMode === 'MANUAL'} className={tradingMode === 'MANUAL' ? 'on' : ''}>MANUAL</button>
-        <button role="tab" aria-selected={tradingMode === 'SEMI'} className={tradingMode === 'SEMI' ? 'on' : ''}>SEMI</button>
-        <button role="tab" aria-selected={tradingMode === 'FULL'} className={tradingMode === 'FULL' ? 'on' : ''}>FULL</button>
+        <button onClick={() => handleModeChange('MANUAL')} role="tab" aria-selected={mode === 'MANUAL'} className={mode === 'MANUAL' ? 'on' : ''}>MANUAL</button>
+        <button onClick={() => handleModeChange('SEMI')} role="tab" aria-selected={mode === 'SEMI'} className={mode === 'SEMI' ? 'on' : ''}>SEMI</button>
+        <button onClick={() => handleModeChange('FULL')} role="tab" aria-selected={mode === 'FULL'} className={mode === 'FULL' ? 'on' : ''}>FULL</button>
       </div>
       <div className="tier">TIER 2 · 2.4M $FLETCH</div>
       <div className="addr">0x7e3B…a3ad</div>
