@@ -17,7 +17,11 @@ export default async function Dashboard() {
   let tradingMode = 'LIVE';
 
   try {
-    const res = await fetch(`${API_URL}/api/dashboard`, { cache: 'no-store' });
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+    const res = await fetch(`${API_URL}/api/dashboard`, { 
+      cache: 'no-store',
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
     if (res.ok) {
       const data = await res.json();
       wallets = data.wallets || [];

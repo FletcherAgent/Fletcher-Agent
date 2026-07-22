@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 interface TopbarProps {
   blk: number;
   tradingMode?: string;
+  dataMode?: string;
 }
 
-export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
+export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN" }: TopbarProps) {
   const [mode, setMode] = useState(tradingMode);
 
   useEffect(() => {
@@ -16,9 +17,13 @@ export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
     setMode(newMode); // Optimistic UI update
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
       await fetch(`${apiUrl}/api/settings/mode`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ mode: newMode })
       });
     } catch (err) {
@@ -44,6 +49,10 @@ export function Topbar({ blk, tradingMode = "SEMI" }: TopbarProps) {
         <button onClick={() => handleModeChange('MANUAL')} role="tab" aria-selected={mode === 'MANUAL'} className={mode === 'MANUAL' ? 'on' : ''}>MANUAL</button>
         <button onClick={() => handleModeChange('SEMI')} role="tab" aria-selected={mode === 'SEMI'} className={mode === 'SEMI' ? 'on' : ''}>SEMI</button>
         <button onClick={() => handleModeChange('FULL')} role="tab" aria-selected={mode === 'FULL'} className={mode === 'FULL' ? 'on' : ''}>FULL</button>
+      </div>
+      <div className="spacer"></div>
+      <div className={`chainpill ${dataMode === 'LIVE' ? 'live-mode' : 'dry-mode'}`} style={{ fontWeight: 'bold', background: dataMode === 'LIVE' ? 'var(--green)' : '#2563EB', color: dataMode === 'LIVE' ? '#000' : '#fff', padding: '4px 10px' }}>
+        {dataMode}
       </div>
       <div className="tier">TIER 2 · 2.4M $FLETCH</div>
       <div className="addr">0x7e3B…a3ad</div>

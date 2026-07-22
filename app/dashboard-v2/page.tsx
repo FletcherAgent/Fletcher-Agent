@@ -31,7 +31,10 @@ export default function DashboardV2() {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const res = await fetch(`${apiUrl}/api/dashboard`);
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+        const res = await fetch(`${apiUrl}/api/dashboard`, {
+          headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
         const json = await res.json();
         setData(json);
       } catch (err) {
@@ -67,9 +70,13 @@ export default function DashboardV2() {
     ...rawSpot.filter(p => p.status !== 'OPEN').map(p => ({ ...p, _type: 'SPOT' }))
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+  // Determine global data mode (if any position is DRY_RUN, it's DRY_RUN, else LIVE)
+  const isDryRun = openPositions.some(p => p.tradingMode === 'DRY_RUN') || historyPositions.some(p => p.tradingMode === 'DRY_RUN');
+  const dataMode = isDryRun ? 'DRY_RUN' : 'LIVE';
+
   return (
     <div className="dashboard-v2-container">
-      <Topbar blk={blk} tradingMode={data?.metrics?.tradingMode} />
+      <Topbar blk={blk} tradingMode={data?.metrics?.tradingMode} dataMode={dataMode} />
 
       <main className="wrap">
         {/* LEFT: Agent Log */}
