@@ -80,7 +80,7 @@ export default function DashboardV2() {
     <div className="dashboard-v2-container">
       <Topbar 
         blk={blk} 
-        tradingMode={data?.metrics?.tradingMode} 
+        tradingMode={data?.metrics?.autonomyMode} 
         dataMode={viewDataMode} 
         onToggleDataMode={() => setViewDataMode(prev => prev === 'LIVE' ? 'DRY_RUN' : 'LIVE')} 
       />
