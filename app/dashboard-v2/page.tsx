@@ -38,7 +38,12 @@ export default function DashboardV2() {
           headers: { 'Authorization': `Bearer ${apiKey}` }
         });
         const json = await res.json();
-        setData(json);
+        setData(prev => {
+          if (!prev && json.metrics?.tradingMode) {
+            setViewDataMode(json.metrics.tradingMode as 'LIVE' | 'DRY_RUN');
+          }
+          return json;
+        });
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       }
