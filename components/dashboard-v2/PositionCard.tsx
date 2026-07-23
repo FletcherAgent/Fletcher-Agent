@@ -17,7 +17,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
       )}
 
       {positions.map((pos: any, idx: number) => {
-        const openedAt = pos.createdAt ? new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }) + ' WIB' : '00:00';
+        const openedAt = pos.createdAt ? new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00';
 
         // --- LP POSITION RENDER ---
         if (pos._type === 'LP') {
