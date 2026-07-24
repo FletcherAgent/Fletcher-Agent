@@ -7,16 +7,14 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
   let totalFees = 0;
   let totalIl = 0;
   let totalDeployed = 0;
-  let allTimeHarvested = 0;
+  
+  // allTimeHarvested is now accurately aggregated by the backend over all historical positions
+  const allTimeHarvested = metrics?.allTimeHarvested || 0;
   
   activePositions.forEach(pos => {
     totalFees += pos.feesCollected || 0;
     totalIl += pos.ilRunning || 0;
     totalDeployed += pos.entryValue || 0;
-  });
-
-  lpPositions.forEach(pos => {
-    allTimeHarvested += pos.feesCollected || 0;
   });
 
   const absIl = Math.abs(totalIl);
