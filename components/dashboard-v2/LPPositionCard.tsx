@@ -48,7 +48,7 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
     };
   }, [pos.pool, pos.id, pos.tradingMode]);
 
-  const openedAt = pos.createdAt ? new Date(pos.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00';
+  const openedAt = pos.createdAt ? new Date(pos.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '00:00';
   const isNight = pos.dayMode === false || pos.nightMode;
   const pair = `${pos.token0Symbol || 'TKN0'} / ${pos.token1Symbol || 'TKN1'}`;
   
