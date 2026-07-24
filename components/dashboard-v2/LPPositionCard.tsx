@@ -54,19 +54,18 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
   
   const MIN_TICK = -887220;
   const MAX_TICK = 887220;
-  const totalTickRange = MAX_TICK - MIN_TICK;
   
-  let rangeLeft = ((pos.tickLower - MIN_TICK) / totalTickRange) * 100;
-  let rangeWidth = ((pos.tickUpper - pos.tickLower) / totalTickRange) * 100;
+  const rangeLeft = 10;
+  const rangeWidth = 80;
   
-  rangeLeft = Math.max(0, Math.min(80, rangeLeft));
-  rangeWidth = Math.max(20, Math.min(100 - rangeLeft, rangeWidth)); 
-  
-  // Calculate dynamic arrowhead position
-  let headLeft = rangeLeft + (rangeWidth / 2); // Default to middle
+  let headLeft = rangeLeft + (rangeWidth / 2); 
   if (currentTick !== null) {
-    headLeft = ((currentTick - MIN_TICK) / totalTickRange) * 100;
-    headLeft = Math.max(0, Math.min(100, headLeft));
+    const tickRange = pos.tickUpper - pos.tickLower;
+    if (tickRange > 0) {
+      const percentage = (currentTick - pos.tickLower) / tickRange;
+      headLeft = rangeLeft + (percentage * rangeWidth);
+    }
+    headLeft = Math.max(rangeLeft, Math.min(rangeLeft + rangeWidth, headLeft));
   }
 
   // Dynamic warning color based on edgeBufferPct
@@ -153,6 +152,21 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
           <svg width="14" height="18" viewBox="0 0 14 18"><path d="M12 0 L2 4 L2 8 L12 4 Z M12 6 L2 10 L2 14 L12 10 Z" fill={arrowColor} opacity=".85"/></svg>
         </div>
         <div className="head" style={{ left: `${headLeft}%`, transition: 'left 0.3s ease-out' }}>
+          {currentTick !== null && (
+            <span style={{
+              position: 'absolute',
+              top: '-18px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '10px',
+              color: '#E9E4D6',
+              whiteSpace: 'nowrap',
+              fontFamily: 'monospace',
+              fontWeight: 600
+            }}>
+              {currentTick}
+            </span>
+          )}
           <svg width="14" height="16" viewBox="0 0 14 16"><path d="M7 0 L14 8 L7 16 L7 11 L0 11 L0 5 L7 5 Z" fill="#E9E4D6"/></svg>
         </div>
         {isFullRange ? (
