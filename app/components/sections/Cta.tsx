@@ -9,7 +9,7 @@ export default function Cta() {
         </p>
         <div className="cta-actions reveal">
           <a href="/dashboard-v2" className="btn-solid" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
-          <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View on Github</a>
+          {/* <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View on Github</a> */}
         </div>
       </div>
     </section>

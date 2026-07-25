@@ -195,7 +195,7 @@ export default function Hero() {
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '32px' }}>
           <a href="/dashboard-v2" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
-          <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #2bff5b', color: '#2bff5b' }}>View on Github</a>
+          {/* <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #2bff5b', color: '#2bff5b' }}>View on Github</a> */}
         </div>
       </div>
 

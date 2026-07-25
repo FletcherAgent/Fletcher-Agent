@@ -18,7 +18,7 @@ export default function Footer() {
         <div className="foot-col">
           <h4>Resources</h4>
           <a href="#">Roadmap</a>
-          <a href="#">GitHub</a>
+          {/* <a href="#">GitHub</a> */}
         </div>
         <div className="foot-col">
           <h4>Community</h4>
