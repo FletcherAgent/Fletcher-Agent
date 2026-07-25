@@ -9,7 +9,8 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
   let totalDeployed = 0;
   
   // allTimeHarvested is now accurately aggregated by the backend over all historical positions
-  const allTimeHarvested = metrics?.allTimeHarvested || 0;
+  const allTimeHarvestedLive = metrics?.allTimeHarvestedLive || 0;
+  const allTimeHarvestedDryRun = metrics?.allTimeHarvestedDryRun || 0;
   
   activePositions.forEach(pos => {
     totalFees += pos.feesCollected || 0;
@@ -74,8 +75,17 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [] }: { m
       </div>
       <div className="stat">
         <div className="k">HARVESTED (ALL TIME)</div>
-        <div className="v"><span className={allTimeHarvested > 0 ? "up" : ""}>{allTimeHarvested > 0 ? '+' : ''}${allTimeHarvested.toFixed(2)}</span></div>
-        <div className="sub">above ${cap >= 1000 ? `${cap/1000}K` : cap}/position cap</div>
+        <div className="v" style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
+          <span className={allTimeHarvestedLive > 0 ? "up" : ""} style={{ fontSize: '18px', lineHeight: '1' }}>
+            <span style={{ fontSize: '10px', color: '#999', marginRight: '6px' }}>LIVE</span>
+            {allTimeHarvestedLive > 0 ? '+' : ''}${allTimeHarvestedLive.toFixed(2)}
+          </span>
+          <span className={allTimeHarvestedDryRun > 0 ? "up" : ""} style={{ fontSize: '18px', lineHeight: '1' }}>
+            <span style={{ fontSize: '10px', color: '#999', marginRight: '6px' }}>DRY</span>
+            {allTimeHarvestedDryRun > 0 ? '+' : ''}${allTimeHarvestedDryRun.toFixed(2)}
+          </span>
+        </div>
+        <div className="sub" style={{ marginTop: '8px' }}>above ${cap >= 1000 ? `${cap/1000}K` : cap}/position cap</div>
       </div>
       <div className="stat">
         <div className="k">FEE vs IL (24H)</div>
