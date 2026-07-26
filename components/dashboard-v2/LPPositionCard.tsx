@@ -122,7 +122,19 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
         {pos.txHash && pos.tradingMode !== 'DRY_RUN' && (
           <a href={`https://robinhoodchain.blockscout.com/tx/${pos.txHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Tx: {pos.txHash.slice(0, 6)}...{pos.txHash.slice(-4)}
+              Tx In
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </span>
+          </a>
+        )}
+        {pos.exitTxHash && pos.tradingMode !== 'DRY_RUN' && (
+          <a href={`https://robinhoodchain.blockscout.com/tx/${pos.exitTxHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              Tx Out
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
