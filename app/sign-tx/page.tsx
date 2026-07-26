@@ -83,7 +83,7 @@ function SignTxContent() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif', color: '#000' }}>
+    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
       <h1>Sign LP Transaction</h1>
       <p>The AI Agent has prepared an LP transaction for you.</p>
 
