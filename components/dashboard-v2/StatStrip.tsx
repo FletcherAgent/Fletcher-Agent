@@ -91,12 +91,12 @@ export function StatStrip({ metrics, lpPositions = [], spotPositions = [], dataM
     <div className="strip">
       <div className="stat">
         <div className="k">SPOT DEPLOYED</div>
-        <div className="v">{spotDeployed.toFixed(3)}</div>
+        <div className="v">{spotDeployed.toFixed(3)} ETH</div>
         <div className="sub">{spotActiveCount} active positions</div>
       </div>
       <div className="stat">
         <div className="k">SPOT PNL (ALL TIME)</div>
-        <div className="v"><span className={spotAllTimePnl >= 0 ? "up" : "down"}>{spotAllTimePnl >= 0 ? '+' : ''}{spotAllTimePnl.toFixed(3)}</span></div>
+        <div className="v"><span className={spotAllTimePnl >= 0 ? "up" : "down"}>{spotAllTimePnl >= 0 ? '+' : ''}{spotAllTimePnl.toFixed(5)} ETH</span></div>
         <div className="sub">Alpha & Copytrade</div>
       </div>
       <div className="stat">

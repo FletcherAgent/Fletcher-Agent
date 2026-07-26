@@ -64,7 +64,7 @@ export function PositionCard({ positions }: { positions: any[] }) {
             <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Size: {pos.size} · opened {openedAt} · Avg R-multiple: {(pos.rMultiple || 0).toFixed(1)}R</span>
               <span style={{ color: (pos.pnl || 0) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
-                PNL: {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}%
+                PNL: {(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * 100).toFixed(2)}% ({(pos.pnl || 0) >= 0 ? '+' : ''}{((pos.pnl || 0) * pos.size).toFixed(5)} ETH)
               </span>
             </div>
             
