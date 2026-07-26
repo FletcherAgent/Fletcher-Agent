@@ -78,7 +78,13 @@ function SignTxContent() {
       setStatus('Transaction Submitted!');
     } catch (err: any) {
       console.error(err);
-      setStatus(`Failed to sign/send: ${err.message}`);
+      let errorMessage = err.shortMessage || err.message || 'Unknown error';
+      if (typeof errorMessage === 'string' && errorMessage.includes('User rejected')) {
+        errorMessage = 'User rejected the request.';
+      } else if (typeof errorMessage === 'string') {
+        errorMessage = errorMessage.split('\n')[0];
+      }
+      setStatus(`Failed: ${errorMessage}`);
     }
   };
 
