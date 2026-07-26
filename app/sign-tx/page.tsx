@@ -83,11 +83,11 @@ function SignTxContent() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif', color: '#000' }}>
       <h1>Sign LP Transaction</h1>
       <p>The AI Agent has prepared an LP transaction for you.</p>
 
-      <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '8px', margin: '20px 0', wordBreak: 'break-all' }}>
+      <div style={{ background: '#f5f5f5', color: '#000', padding: '16px', borderRadius: '8px', margin: '20px 0', wordBreak: 'break-all' }}>
         <strong>To:</strong> {to || 'Missing'}<br/>
         <strong>Value:</strong> {value} wei<br/>
         <strong>Data:</strong> {data ? `${data.substring(0, 50)}...` : 'Missing'}
