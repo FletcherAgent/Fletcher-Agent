@@ -83,44 +83,125 @@ function SignTxContent() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <h1>Sign LP Transaction</h1>
-      <p>The AI Agent has prepared an LP transaction for you.</p>
+    <div style={{ 
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 20px'
+    }}>
+      <div style={{ 
+        width: '100%',
+        maxWidth: '600px', 
+        background: 'rgba(24, 24, 24, 0.4)',
+        border: '1px solid var(--line)',
+        borderRadius: '12px',
+        padding: '32px',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h1 style={{ fontFamily: 'var(--disp)', fontSize: '28px', color: 'var(--ink)', marginBottom: '8px', letterSpacing: '0.05em' }}>
+            SIGN LP TRANSACTION
+          </h1>
+          <p style={{ color: 'var(--dim)', fontSize: '14px' }}>The Fletcher AI Agent has prepared an LP transaction for you.</p>
+        </div>
 
-      <div style={{ background: '#f5f5f5', color: '#000', padding: '16px', borderRadius: '8px', margin: '20px 0', wordBreak: 'break-all' }}>
-        <strong>To:</strong> {to || 'Missing'}<br/>
-        <strong>Value:</strong> {value} wei<br/>
-        <strong>Data:</strong> {data ? `${data.substring(0, 50)}...` : 'Missing'}
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <strong>Status:</strong> {status}
-      </div>
-
-      {address ? (
-        <div>
-          <p>Connected as: <strong>{address}</strong></p>
-          {!txHash ? (
-            <button 
-              onClick={signTransaction}
-              style={{ padding: '12px 24px', background: '#7D52F4', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Sign & Execute Transaction
-            </button>
-          ) : (
-            <div style={{ color: 'green', marginTop: '12px' }}>
-              Transaction Hash: <a href={`https://robinhoodchain.blockscout.com/tx/${txHash}`} target="_blank" rel="noreferrer">{txHash}</a>
+        <div style={{ 
+          background: '#0a0a0a', 
+          border: '1px solid var(--line)',
+          color: 'var(--green)', 
+          padding: '20px', 
+          borderRadius: '8px', 
+          marginBottom: '24px', 
+          wordBreak: 'break-all',
+          fontFamily: 'var(--mono)',
+          fontSize: '13px',
+          lineHeight: '1.8'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <span style={{ color: 'var(--faint)', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>To</span>
+              <span style={{ color: 'var(--ink)' }}>{to || 'Missing'}</span>
             </div>
+            <div>
+              <span style={{ color: 'var(--faint)', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Value</span>
+              <span style={{ color: 'var(--ink)' }}>{value} wei</span>
+            </div>
+            <div>
+              <span style={{ color: 'var(--faint)', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Data</span>
+              <span style={{ color: 'var(--dim)' }}>{data ? `${data.substring(0, 100)}...` : 'Missing'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          padding: '16px',
+          background: 'rgba(0,0,0,0.2)',
+          borderRadius: '8px',
+          border: '1px solid var(--line)',
+          marginBottom: '32px'
+        }}>
+          <div>
+            <span style={{ color: 'var(--faint)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Status</span>
+            <span style={{ 
+              color: status === 'Transaction Submitted!' ? 'var(--green)' : 
+                     status.includes('Failed') || status.includes('Error') ? '#ff3366' : 'var(--ink)',
+              fontSize: '14px',
+              fontWeight: 500
+            }}>
+              {status}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          {address ? (
+            <div>
+              <div style={{ marginBottom: '24px', fontSize: '13px', color: 'var(--dim)' }}>
+                Connected Wallet: <strong style={{ color: 'var(--ink)', background: '#111', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--line)' }}>{`${address.substring(0, 6)}...${address.substring(address.length - 4)}`}</strong>
+              </div>
+              
+              {!txHash ? (
+                <button 
+                  onClick={signTransaction}
+                  className="btn-app"
+                  style={{ width: '100%', padding: '16px', fontSize: '15px' }}
+                >
+                  EXECUTE TRANSACTION
+                </button>
+              ) : (
+                <a 
+                  href={`https://robinhoodchain.blockscout.com/tx/${txHash}`} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="btn-app"
+                  style={{ display: 'block', width: '100%', padding: '16px', fontSize: '14px', background: 'transparent', border: '1px solid var(--green)', color: 'var(--green)' }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    View on Blockscout
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '6px' }}>
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </span>
+                </a>
+              )}
+            </div>
+          ) : (
+            <button 
+              onClick={connectWallet}
+              className="btn-app"
+              style={{ width: '100%', padding: '16px', fontSize: '15px', background: '#222', color: 'var(--ink)' }}
+            >
+              CONNECT WALLET
+            </button>
           )}
         </div>
-      ) : (
-        <button 
-          onClick={connectWallet}
-          style={{ padding: '12px 24px', background: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          Connect Wallet
-        </button>
-      )}
+      </div>
     </div>
   );
 }
