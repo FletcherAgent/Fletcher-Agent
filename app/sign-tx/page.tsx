@@ -4,13 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { createWalletClient, custom, type Hex } from 'viem';
 import { useSearchParams } from 'next/navigation';
 
+import { Suspense } from 'react';
+
 declare global {
   interface Window {
     ethereum?: any;
   }
 }
 
-export default function SignTxPage() {
+function SignTxContent() {
   const searchParams = useSearchParams();
   const to = searchParams?.get('to') as Hex;
   const data = searchParams?.get('data') as Hex;
@@ -120,5 +122,13 @@ export default function SignTxPage() {
         </button>
       )}
     </div>
+  );
+}
+
+export default function SignTxPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '40px', fontFamily: 'sans-serif' }}>Loading transaction details...</div>}>
+      <SignTxContent />
+    </Suspense>
   );
 }
