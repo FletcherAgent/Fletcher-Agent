@@ -12,6 +12,8 @@ import { ScreeningFeed } from "../../../components/dashboard-v2/ScreeningFeed";
 import { TrackerSignals } from "../../../components/dashboard-v2/TrackerSignals";
 import { AgentLog } from "../../../components/dashboard-v2/AgentLog";
 import { Footer } from "../../../components/dashboard-v2/Footer";
+import { UserAgentSection } from "../../../components/dashboard-v2/UserAgentSection";
+import { PendingActionsList } from "../../../components/dashboard-v2/PendingActionsList";
 
 export default function DashboardV2({ params }: { params: { address: string } }) {
   const [blk, setBlk] = useState(2481395);
@@ -24,6 +26,8 @@ export default function DashboardV2({ params }: { params: { address: string } })
     lpPositions: any[];
     logs: any[];
     metrics: any;
+    agents?: any[];
+    user?: any;
   } | null>(null);
 
   const [viewDataMode, setViewDataMode] = useState<'LIVE' | 'DRY_RUN'>('LIVE');
@@ -102,6 +106,23 @@ export default function DashboardV2({ params }: { params: { address: string } })
         {/* MIDDLE: positions */}
         <section className="col">
           <StatStrip metrics={data?.metrics} lpPositions={filteredLp} spotPositions={filteredSpot} dataMode={viewDataMode} />
+          
+          <UserAgentSection 
+            agents={data?.agents || []} 
+            user={data?.user} 
+            onRefresh={() => {
+              // Trigger a re-fetch of the data
+              const btn = document.createElement('button');
+              btn.style.display = 'none';
+              document.body.appendChild(btn);
+              setTimeout(() => {
+                document.body.removeChild(btn);
+              }, 100);
+            }} 
+          />
+
+          <PendingActionsList />
+
           <PositionCard positions={openPositions} />
           <SpotPositionCard positions={historyPositions} />
         </section>
