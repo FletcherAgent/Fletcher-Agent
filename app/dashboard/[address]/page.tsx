@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import "./dashboard.css"; // Import the CSS module
+import "../dashboard.css"; // Import the CSS module
 
 // Components
-import { Topbar } from "../../components/dashboard-v2/Topbar";
-import { StatStrip } from "../../components/dashboard-v2/StatStrip";
-import { PositionCard } from "../../components/dashboard-v2/PositionCard";
-import { SpotPositionCard } from "../../components/dashboard-v2/SpotPositionCard";
-import { ScreeningFeed } from "../../components/dashboard-v2/ScreeningFeed";
-import { TrackerSignals } from "../../components/dashboard-v2/TrackerSignals";
-import { AgentLog } from "../../components/dashboard-v2/AgentLog";
-import { Footer } from "../../components/dashboard-v2/Footer";
+import { Topbar } from "../../../components/dashboard-v2/Topbar";
+import { StatStrip } from "../../../components/dashboard-v2/StatStrip";
+import { PositionCard } from "../../../components/dashboard-v2/PositionCard";
+import { SpotPositionCard } from "../../../components/dashboard-v2/SpotPositionCard";
+import { ScreeningFeed } from "../../../components/dashboard-v2/ScreeningFeed";
+import { TrackerSignals } from "../../../components/dashboard-v2/TrackerSignals";
+import { AgentLog } from "../../../components/dashboard-v2/AgentLog";
+import { Footer } from "../../../components/dashboard-v2/Footer";
 
-export default function DashboardV2() {
+export default function DashboardV2({ params }: { params: { address: string } }) {
   const [blk, setBlk] = useState(2481395);
   
   // Real Data State
@@ -35,7 +35,10 @@ export default function DashboardV2() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
         const res = await fetch(`${apiUrl}/api/dashboard`, {
-          headers: { 'Authorization': `Bearer ${apiKey}` }
+          headers: { 
+            'Authorization': `Bearer ${apiKey}`,
+            'x-wallet-address': params.address
+          }
         });
         const json = await res.json();
         setData(prev => {

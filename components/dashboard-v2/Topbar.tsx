@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface TopbarProps {
   blk: number;
@@ -8,6 +11,21 @@ interface TopbarProps {
 }
 
 export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN", onToggleDataMode }: TopbarProps) {
+  const { address, isConnected, isDisconnected } = useAccount();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // If user connects wallet and is on public dashboard, redirect to their private dashboard
+    if (isConnected && address && pathname === '/dashboard') {
+      router.push(`/dashboard/${address}`);
+    }
+    // If user disconnects wallet and is on private dashboard, redirect to public dashboard
+    if (isDisconnected && pathname.startsWith('/dashboard/') && pathname !== '/dashboard') {
+      router.push('/dashboard');
+    }
+  }, [isConnected, isDisconnected, address, pathname, router]);
+
   // Autonomy mode is managed by Telegram bot, UI is read-only.
 
   return (
@@ -41,8 +59,9 @@ export function Topbar({ blk, tradingMode = "SEMI", dataMode = "DRY_RUN", onTogg
           <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
         </svg>
       </div>
-      <div className="tier">TIER 2 · 2.4M $FLETCH</div>
-      <div className="addr">0x7e3B…a3ad</div>
+      <div style={{ paddingLeft: '16px' }}>
+        <ConnectButton />
+      </div>
     </header>
   );
 }
