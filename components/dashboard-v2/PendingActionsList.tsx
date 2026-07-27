@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAccount, useSendTransaction } from "wagmi";
 import { Modal } from "./Modal";
 
-export function PendingActionsList() {
+export function PendingActionsList({ isActive = true }: { isActive?: boolean }) {
   const { address, isConnected } = useAccount();
   const { sendTransactionAsync } = useSendTransaction();
   const [actions, setActions] = useState<any[]>([]);
@@ -31,10 +31,12 @@ export function PendingActionsList() {
   };
 
   useEffect(() => {
+    if (!isActive) return;
+    
     fetchActions();
     const interval = setInterval(fetchActions, 5000);
     return () => clearInterval(interval);
-  }, [address]);
+  }, [address, isActive]);
 
   const handleApprove = async (action: any) => {
     try {

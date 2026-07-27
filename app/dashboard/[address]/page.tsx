@@ -149,7 +149,7 @@ export default function DashboardV2({ params }: { params: Promise<{ address: str
             />
           )}
 
-          <PendingActionsList />
+          <PendingActionsList isActive={data?.user?.agents?.[0]?.status === 'ACTIVE'} />
 
           <PositionCard positions={openPositions} />
           <SpotPositionCard positions={historyPositions} />
