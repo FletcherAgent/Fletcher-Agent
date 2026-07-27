@@ -13,7 +13,10 @@ export function PendingActionsList() {
     if (!address) return;
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/api/agents/pending-actions?wallet=${address}`);
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+      const res = await fetch(`${apiUrl}/api/agents/pending-actions?wallet=${address}`, {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
       const data = await res.json();
       setActions(data.actions || []);
     } catch (e) {
@@ -41,9 +44,13 @@ export function PendingActionsList() {
 
       // 2. Notify backend of successful execution
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
       await fetch(`${apiUrl}/api/agents/execute-action`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ actionId: action.id, txHash })
       });
 

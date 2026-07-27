@@ -18,9 +18,14 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       const signature = await signMessageAsync({ message: "Deploy Fletcher Agent for my address: " + address });
       
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
       const res = await fetch(`${apiUrl}/api/agents/deploy`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-wallet-address": address as string },
+        headers: { 
+          "Content-Type": "application/json", 
+          "x-wallet-address": address as string,
+          "Authorization": `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ signature, capital: "500", strategy: "NIGHT_MODE" })
       });
       
@@ -44,9 +49,14 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       const signature = await signMessageAsync({ message: "Link Telegram for my address: " + address });
       
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
       const res = await fetch(`${apiUrl}/api/user/link-telegram`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-wallet-address": address as string },
+        headers: { 
+          "Content-Type": "application/json", 
+          "x-wallet-address": address as string,
+          "Authorization": `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ signature })
       });
       
