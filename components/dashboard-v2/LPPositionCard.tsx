@@ -97,8 +97,10 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
   const timeString = `${hoursLeft.toString().padStart(2, '0')}:${minsLeft.toString().padStart(2, '0')}:${secsLeft.toString().padStart(2, '0')}`;
 
   const entryValue = pos.entryValue || 1;
-  const feesWidth = Math.min(100, Math.max(0, ((pos.feesCollected || 0) / entryValue) * 100));
-  const ilWidth = Math.min(100, Math.max(0, (Math.abs(pos.ilRunning || 0) / entryValue) * 100));
+  // Make 100% bar width correspond to 5% of entry value (min $10) for highly dynamic animations
+  const barMaxScale = Math.max(entryValue * 0.05, 10);
+  const feesWidth = Math.min(100, Math.max(0, ((pos.feesCollected || 0) / barMaxScale) * 100));
+  const ilWidth = Math.min(100, Math.max(0, (Math.abs(pos.ilRunning || 0) / barMaxScale) * 100));
   
   const daysOpen = pos.createdAt ? Math.max(0.1, (now - new Date(pos.createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0.1;
   const feeEarnedPct = ((pos.feesCollected || 0) / entryValue) * 100;
@@ -122,7 +124,7 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
         {pos.txHash && pos.tradingMode !== 'DRY_RUN' && (
           <a href={`https://robinhoodchain.blockscout.com/tx/${pos.txHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Tx In
+              Tx In: {pos.txHash.substring(0, 6)}...{pos.txHash.substring(pos.txHash.length - 4)}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -134,7 +136,7 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
         {pos.exitTxHash && pos.tradingMode !== 'DRY_RUN' && (
           <a href={`https://robinhoodchain.blockscout.com/tx/${pos.exitTxHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Tx Out
+              Tx Out: {pos.exitTxHash.substring(0, 6)}...{pos.exitTxHash.substring(pos.exitTxHash.length - 4)}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
