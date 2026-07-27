@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAccount, useSignMessage, useReadContract } from "wagmi";
+import { useAccount, useSignMessage, useReadContract, useWriteContract } from "wagmi";
 import { Modal } from "./Modal";
 
 export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], user: any, onRefresh: () => void }) {
@@ -13,9 +13,12 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [deployConfirmOpen, setDeployConfirmOpen] = useState(false);
   const [inputCapital, setInputCapital] = useState("500");
   const [copied, setCopied] = useState(false);
+  const [loadingDeposit, setLoadingDeposit] = useState(false);
 
   const REQUIRED_BALANCE = 2500000;
   const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
+  const WETH_ADDRESS = (process.env.NEXT_PUBLIC_WETH_ADDRESS || '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') as `0x${string}`;
+  const { writeContractAsync } = useWriteContract();
 
   const { data: balanceData } = useReadContract({
     address: FLETCH_CA,
@@ -41,6 +44,22 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   };
 
   const agent = agents?.[0]; // Support single agent for MVP
+
+  const { data: agentWethBalance, refetch: refetchAgentBalance } = useReadContract({
+    address: WETH_ADDRESS,
+    abi: [{
+      name: 'balanceOf',
+      type: 'function',
+      stateMutability: 'view',
+      inputs: [{ name: 'account', type: 'address' }],
+      outputs: [{ type: 'uint256' }]
+    }],
+    functionName: 'balanceOf',
+    args: agent ? [agent.smartAccountAddress as `0x${string}`] : undefined,
+    query: { enabled: !!agent }
+  });
+
+  const isFunded = agentWethBalance ? (agentWethBalance as bigint) > BigInt(0) : false;
 
   const handleDeployAgent = async () => {
     try {
@@ -102,6 +121,34 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       showModal("Linking Failed", e.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeposit = async () => {
+    if (!agent) return;
+    try {
+      setLoadingDeposit(true);
+      const amountParsed = BigInt(Math.floor(parseFloat(agent.capital.toString()) * 1e18));
+      const tx = await writeContractAsync({
+        address: WETH_ADDRESS,
+        abi: [{
+          name: 'transfer',
+          type: 'function',
+          stateMutability: 'nonpayable',
+          inputs: [
+            { name: 'to', type: 'address' },
+            { name: 'amount', type: 'uint256' }
+          ],
+          outputs: [{ type: 'bool' }]
+        }],
+        functionName: 'transfer',
+        args: [agent.smartAccountAddress as `0x${string}`, amountParsed]
+      });
+      showModal("Deposit Initiated", `Transaction sent: ${tx}. Please wait a few seconds and click the 🔄 Refresh button.`);
+    } catch(e: any) {
+      showModal("Deposit Failed", e.message);
+    } finally {
+      setLoadingDeposit(false);
     }
   };
 
@@ -199,30 +246,54 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             <line x1="16" y1="16" x2="16.01" y2="16"></line>
           </svg>
           {agent.name}
-          {user?.telegramChatId ? (
+          {agent.status === 'PENDING_FUNDING' && !isFunded ? (
+            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
+              PENDING FUNDING
+            </span>
+          ) : user?.telegramChatId ? (
             <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(43,255,91,0.1)', color: 'var(--green)', borderRadius: '4px', border: '1px solid var(--green)', marginLeft: '8px' }}>
               ACTIVE
             </span>
           ) : (
             <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
-              PENDING
+              PENDING TELEGRAM
             </span>
           )}
         </h3>
         
-        {!user?.telegramChatId ? (
+        <div style={{ display: 'flex', gap: '8px' }}>
           <button 
-            onClick={handleLinkTelegram}
-            disabled={loading}
-            style={{ padding: '6px 12px', background: '#0088cc', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
+            onClick={() => refetchAgentBalance()}
+            style={{ padding: '6px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            title="Refresh Balance"
           >
-            {loading ? "Generating..." : "Link Telegram"}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-5.67"/>
+            </svg>
           </button>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0088cc', fontWeight: 'bold', fontSize: '14px' }}>
-            ✓ Linked to @{user.telegramUsername}
-          </div>
-        )}
+          
+          {agent.status === 'PENDING_FUNDING' && !isFunded ? (
+            <button 
+              onClick={handleDeposit}
+              disabled={loadingDeposit}
+              style={{ padding: '6px 12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
+            >
+              {loadingDeposit ? "Depositing..." : `Deposit ${agent.capital} WETH`}
+            </button>
+          ) : !user?.telegramChatId ? (
+            <button 
+              onClick={handleLinkTelegram}
+              disabled={loading}
+              style={{ padding: '6px 12px', background: '#0088cc', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
+            >
+              {loading ? "Generating..." : "Link Telegram"}
+            </button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0088cc', fontWeight: 'bold', fontSize: '14px' }}>
+              ✓ Linked to @{user.telegramUsername}
+            </div>
+          )}
+        </div>
       </div>
 
       <h4 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>Your Personal Fletcher Agent</h4>
