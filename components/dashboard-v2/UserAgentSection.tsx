@@ -171,9 +171,15 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             <line x1="16" y1="16" x2="16.01" y2="16"></line>
           </svg>
           {agent.name}
-          <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(43,255,91,0.1)', color: 'var(--green)', borderRadius: '4px', border: '1px solid var(--green)', marginLeft: '8px' }}>
-            ACTIVE
-          </span>
+          {user?.telegramChatId ? (
+            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(43,255,91,0.1)', color: 'var(--green)', borderRadius: '4px', border: '1px solid var(--green)', marginLeft: '8px' }}>
+              ACTIVE
+            </span>
+          ) : (
+            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
+              PENDING
+            </span>
+          )}
         </h3>
         
         {!user?.telegramChatId ? (
@@ -228,7 +234,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
 
       {linkCode && (
         <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(0,136,204,0.1)', border: '1px solid #0088cc', borderRadius: '8px' }}>
-          <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>To complete linking, send this code to <b>@FletcherRhcBot</b> on Telegram:</p>
+          <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>To complete linking, send this code to <b>@Fletcher_MasterBot</b> on Telegram:</p>
           <div style={{ fontSize: '24px', letterSpacing: '2px', fontWeight: 'bold', fontFamily: 'var(--font-jetbrains-mono)', color: '#0088cc', textAlign: 'center' }}>
             /link {linkCode}
           </div>
