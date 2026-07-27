@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createWalletClient, custom, type Hex } from 'viem';
 import { useSearchParams } from 'next/navigation';
+import { Modal } from '../../components/dashboard-v2/Modal';
 
 import { Suspense } from 'react';
 
@@ -21,6 +22,11 @@ function SignTxContent() {
   const [address, setAddress] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('Not connected');
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<{isOpen: boolean, title: string, message: React.ReactNode}>({ isOpen: false, title: '', message: '' });
+
+  const showModal = (title: string, message: React.ReactNode) => {
+    setModalState({ isOpen: true, title, message });
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
@@ -33,7 +39,7 @@ function SignTxContent() {
 
   const connectWallet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
-      alert("Please install MetaMask or another Web3 wallet.");
+      showModal("Wallet Required", "Please install MetaMask or another Web3 wallet.");
       return;
     }
     try {
@@ -51,11 +57,11 @@ function SignTxContent() {
 
   const signTransaction = async () => {
     if (!address) {
-      alert("Please connect wallet first");
+      showModal("Wallet Required", "Please connect wallet first");
       return;
     }
     if (!to || !data) {
-      alert("Missing 'to' or 'data' parameters in URL");
+      showModal("Missing Parameters", "Missing 'to' or 'data' parameters in URL");
       return;
     }
 
@@ -208,6 +214,13 @@ function SignTxContent() {
           )}
         </div>
       </div>
+      
+      <Modal 
+        isOpen={modalState.isOpen} 
+        onClose={() => setModalState(s => ({ ...s, isOpen: false }))} 
+        title={modalState.title} 
+        message={modalState.message} 
+      />
     </div>
   );
 }

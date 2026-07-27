@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import "../dashboard.css"; // Import the CSS module
 
 // Components
@@ -14,8 +14,10 @@ import { AgentLog } from "../../../components/dashboard-v2/AgentLog";
 import { Footer } from "../../../components/dashboard-v2/Footer";
 import { UserAgentSection } from "../../../components/dashboard-v2/UserAgentSection";
 import { PendingActionsList } from "../../../components/dashboard-v2/PendingActionsList";
+import { Modal } from '../../../components/dashboard-v2/Modal';
 
-export default function DashboardV2({ params }: { params: { address: string } }) {
+export default function DashboardV2({ params }: { params: Promise<{ address: string }> }) {
+  const { address } = use(params);
   const [blk, setBlk] = useState(2481395);
   
   // Real Data State
@@ -31,6 +33,7 @@ export default function DashboardV2({ params }: { params: { address: string } })
   } | null>(null);
 
   const [viewDataMode, setViewDataMode] = useState<'LIVE' | 'DRY_RUN'>('LIVE');
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
 
   useEffect(() => {
     // Fetch real data from backend
@@ -41,7 +44,7 @@ export default function DashboardV2({ params }: { params: { address: string } })
         const res = await fetch(`${apiUrl}/api/dashboard`, {
           headers: { 
             'Authorization': `Bearer ${apiKey}`,
-            'x-wallet-address': params.address
+            'x-wallet-address': address
           }
         });
         const json = await res.json();
@@ -95,6 +98,30 @@ export default function DashboardV2({ params }: { params: { address: string } })
         tradingMode={data?.metrics?.autonomyMode} 
         dataMode={viewDataMode} 
         onToggleDataMode={() => setViewDataMode(prev => prev === 'LIVE' ? 'DRY_RUN' : 'LIVE')} 
+        userDashboard={true}
+        agentName={data?.agents?.[0]?.name}
+        onAgentClick={() => setIsAgentModalOpen(true)}
+      />
+
+      <Modal
+        isOpen={isAgentModalOpen}
+        onClose={() => setIsAgentModalOpen(false)}
+        title="Fletcher Agent"
+        message={
+          <UserAgentSection 
+            agents={data?.agents || []} 
+            user={data?.user} 
+            onRefresh={() => {
+              setIsAgentModalOpen(false);
+              const btn = document.createElement('button');
+              btn.style.display = 'none';
+              document.body.appendChild(btn);
+              setTimeout(() => {
+                document.body.removeChild(btn);
+              }, 100);
+            }} 
+          />
+        }
       />
 
       <main className="wrap">
@@ -107,19 +134,20 @@ export default function DashboardV2({ params }: { params: { address: string } })
         <section className="col">
           <StatStrip metrics={data?.metrics} lpPositions={filteredLp} spotPositions={filteredSpot} dataMode={viewDataMode} />
           
-          <UserAgentSection 
-            agents={data?.agents || []} 
-            user={data?.user} 
-            onRefresh={() => {
-              // Trigger a re-fetch of the data
-              const btn = document.createElement('button');
-              btn.style.display = 'none';
-              document.body.appendChild(btn);
-              setTimeout(() => {
-                document.body.removeChild(btn);
-              }, 100);
-            }} 
-          />
+          {(!data?.agents || data.agents.length === 0) && (
+            <UserAgentSection 
+              agents={data?.agents || []} 
+              user={data?.user} 
+              onRefresh={() => {
+                const btn = document.createElement('button');
+                btn.style.display = 'none';
+                document.body.appendChild(btn);
+                setTimeout(() => {
+                  document.body.removeChild(btn);
+                }, 100);
+              }} 
+            />
+          )}
 
           <PendingActionsList />
 

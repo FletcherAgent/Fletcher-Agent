@@ -2,12 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { useAccount, useSendTransaction } from "wagmi";
+import { Modal } from "./Modal";
 
 export function PendingActionsList() {
   const { address, isConnected } = useAccount();
   const { sendTransactionAsync } = useSendTransaction();
   const [actions, setActions] = useState<any[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<{isOpen: boolean, title: string, message: React.ReactNode}>({ isOpen: false, title: '', message: '' });
+
+  const showModal = (title: string, message: React.ReactNode) => {
+    setModalState({ isOpen: true, title, message });
+  };
 
   const fetchActions = async () => {
     if (!address) return;
@@ -54,10 +60,10 @@ export function PendingActionsList() {
         body: JSON.stringify({ actionId: action.id, txHash })
       });
 
-      alert(`Transaction Approved! Hash: ${txHash.slice(0, 10)}...`);
+      showModal("Transaction Approved", `Hash: ${txHash.slice(0, 10)}...`);
       fetchActions();
     } catch (e: any) {
-      alert("Transaction failed or rejected: " + e.message);
+      showModal("Transaction Failed", e.message);
     } finally {
       setLoadingId(null);
     }
@@ -103,6 +109,13 @@ export function PendingActionsList() {
           );
         })}
       </div>
+
+      <Modal 
+        isOpen={modalState.isOpen} 
+        onClose={() => setModalState(s => ({ ...s, isOpen: false }))} 
+        title={modalState.title} 
+        message={modalState.message} 
+      />
     </div>
   );
 }
