@@ -106,7 +106,7 @@ export default function DashboardV2({ params }: { params: Promise<{ address: str
       <Modal
         isOpen={isAgentModalOpen}
         onClose={() => setIsAgentModalOpen(false)}
-        title="Fletcher Agent"
+        title="Info Fletcher Agent"
         message={
           <UserAgentSection 
             agents={data?.agents || []} 

@@ -4,6 +4,13 @@ import React, { useState } from "react";
 import { useAccount, useSignMessage, useReadContract, useWriteContract } from "wagmi";
 import { Modal } from "./Modal";
 
+const parseError = (e: any): string => {
+  const msg = e?.shortMessage || e?.message || String(e);
+  if (msg.includes('User rejected the request')) return 'Transaction was rejected by the user in their wallet.';
+  if (msg.includes('insufficient funds')) return 'Insufficient funds to complete this transaction.';
+  return msg.split('\n')[0];
+};
+
 export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], user: any, onRefresh: () => void }) {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
@@ -16,6 +23,9 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [loadingDeposit, setLoadingDeposit] = useState(false);
   const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
   const [loadingWithdraw, setLoadingWithdraw] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [depositAmount, setDepositAmount] = useState(agents?.[0]?.capital?.toString() || "500");
+  const [depositConfirmOpen, setDepositConfirmOpen] = useState(false);
 
   const REQUIRED_BALANCE = 2500000;
   const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
@@ -58,7 +68,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
     }],
     functionName: 'balanceOf',
     args: agent ? [agent.smartAccountAddress as `0x${string}`] : undefined,
-    query: { enabled: !!agent }
+    query: { enabled: !!agent, staleTime: Infinity, refetchOnWindowFocus: false }
   });
 
   const isFunded = agentWethBalance ? (agentWethBalance as bigint) > BigInt(0) : false;
@@ -90,7 +100,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         onRefresh();
       }
     } catch (e: any) {
-      showModal("Deployment Failed", e.message);
+      showModal("Deployment Failed", parseError(e));
     } finally {
       setLoading(false);
     }
@@ -120,7 +130,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         setLinkCode(data.code);
       }
     } catch (e: any) {
-      showModal("Linking Failed", e.message);
+      showModal("Linking Failed", parseError(e));
     } finally {
       setLoading(false);
     }
@@ -129,8 +139,9 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const handleDeposit = async () => {
     if (!agent) return;
     try {
+      setDepositConfirmOpen(false);
       setLoadingDeposit(true);
-      const amountParsed = BigInt(Math.floor(parseFloat(agent.capital.toString()) * 1e18));
+      const amountParsed = BigInt(Math.floor(parseFloat(depositAmount) * 1e18));
       const tx = await writeContractAsync({
         address: WETH_ADDRESS,
         abi: [{
@@ -148,7 +159,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       });
       showModal("Deposit Initiated", `Transaction sent: ${tx}. Please wait a few seconds and click the 🔄 Refresh button.`);
     } catch(e: any) {
-      showModal("Deposit Failed", e.message);
+      showModal("Deposit Failed", parseError(e));
     } finally {
       setLoadingDeposit(false);
     }
@@ -183,7 +194,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         refetchAgentBalance();
       }
     } catch (e: any) {
-      showModal("Withdraw Failed", e.message);
+      showModal("Withdraw Failed", parseError(e));
     } finally {
       setLoadingWithdraw(false);
     }
@@ -267,32 +278,11 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             </div>
           }
         />
-        <Modal
-          isOpen={withdrawConfirmOpen}
-          onClose={() => setWithdrawConfirmOpen(false)}
-          title="Confirm Withdraw"
-          message={
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
-              <p style={{ margin: 0 }}>You are about to withdraw capital from your Fletcher Agent's Smart Account back to your main wallet.</p>
-              
-              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
-                <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#f59e0b' }}>Important Information:</div>
-                <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
-                  <li>This action will withdraw <strong>ALL IDLE WETH</strong> currently held in your Agent's Smart Account.</li>
-                  <li>WETH that is currently actively deployed in LP positions will <strong>NOT</strong> be withdrawn.</li>
-                  <li>You must sign a message in your wallet to authorize this action.</li>
-                </ul>
-              </div>
-
-              <button 
-                onClick={handleWithdraw}
-                disabled={loadingWithdraw}
-                style={{ padding: '12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}
-              >
-                {loadingWithdraw ? "Processing..." : "Sign & Withdraw All Idle WETH"}
-              </button>
-            </div>
-          }
+        <Modal 
+          isOpen={modalState.isOpen} 
+          onClose={() => setModalState(s => ({ ...s, isOpen: false }))} 
+          title={modalState.title} 
+          message={modalState.message} 
         />
       </div>
     );
@@ -300,41 +290,51 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
 
   return (
     <div style={{ marginBottom: '10px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--green)' }}>
-            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-            <circle cx="12" cy="5" r="2"></circle>
-            <path d="M12 7v4"></path>
-            <line x1="8" y1="16" x2="8.01" y2="16"></line>
-            <line x1="16" y1="16" x2="16.01" y2="16"></line>
-          </svg>
-          {agent.name}
-          {agent.status === 'PENDING_FUNDING' && !isFunded ? (
-            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
-              PENDING FUNDING
-            </span>
-          ) : user?.telegramChatId ? (
-            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(43,255,91,0.1)', color: 'var(--green)', borderRadius: '4px', border: '1px solid var(--green)', marginLeft: '8px' }}>
-              ACTIVE
-            </span>
-          ) : (
-            <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
-              PENDING TELEGRAM
-            </span>
-          )}
-        </h3>
-        
-        <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+        {/* Row 1: Agent Name & Refresh */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <h3 style={{ fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--green)' }}>
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+              <circle cx="12" cy="5" r="2"></circle>
+              <path d="M12 7v4"></path>
+              <line x1="8" y1="16" x2="8.01" y2="16"></line>
+              <line x1="16" y1="16" x2="16.01" y2="16"></line>
+            </svg>
+            {agent.name}
+            {agent.status === 'PENDING_FUNDING' && !isFunded ? (
+              <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
+                PENDING FUNDING
+              </span>
+            ) : user?.telegramChatId ? (
+              <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(43,255,91,0.1)', color: 'var(--green)', borderRadius: '4px', border: '1px solid var(--green)', marginLeft: '8px' }}>
+                ACTIVE
+              </span>
+            ) : (
+              <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
+                PENDING TELEGRAM
+              </span>
+            )}
+          </h3>
+          
           <button 
-            onClick={() => refetchAgentBalance()}
+            onClick={async () => {
+              setIsRefreshing(true);
+              await refetchAgentBalance();
+              setTimeout(() => setIsRefreshing(false), 500); // Give it a minimum spin time so user sees it
+            }}
+            disabled={isRefreshing}
             style={{ padding: '6px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             title="Refresh Balance"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }}>
               <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-5.67"/>
             </svg>
           </button>
+        </div>
+
+        {/* Row 2: Actions */}
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', width: '100%', flexWrap: 'wrap' }}>
           <button 
             onClick={() => setWithdrawConfirmOpen(true)}
             disabled={loadingWithdraw}
@@ -344,21 +344,20 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             {loadingWithdraw ? (
               <span style={{ fontSize: '12px', padding: '0 4px' }}>...</span>
             ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-              </svg>
+              <span style={{ fontSize: '12px', padding: '0 8px', fontWeight: 'bold' }}>Withdraw</span>
             )}
           </button>
           
-          {agent.status === 'PENDING_FUNDING' && !isFunded ? (
+          {agent.status === 'PENDING_FUNDING' && !isFunded && (
             <button 
-              onClick={handleDeposit}
-              disabled={loadingDeposit}
+              onClick={() => setDepositConfirmOpen(true)}
               style={{ padding: '6px 12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
             >
-              {loadingDeposit ? "Depositing..." : `Deposit ${agent.capital} WETH`}
+              Deposit Capital
             </button>
-          ) : !user?.telegramChatId ? (
+          )}
+          
+          {!user?.telegramChatId ? (
             <button 
               onClick={handleLinkTelegram}
               disabled={loading}
@@ -380,18 +379,23 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         Requires Tier 1 (2,500,000 $FLETCH) balance.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px' }}>
+      <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', overflow: 'hidden' }}>
         <div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Smart Account (Zero-Custody)</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <a 
               href={`https://robinhoodchain.blockscout.com/address/${agent.smartAccountAddress}`}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontFamily: 'var(--font-jetbrains-mono)', color: 'var(--green)', textDecoration: 'none' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-jetbrains-mono)', color: 'var(--green)', textDecoration: 'none', wordBreak: 'break-all' }}
               title="View on Robinhood Chain Explorer"
             >
-              {agent.smartAccountAddress.slice(0,6)}...{agent.smartAccountAddress.slice(-4)}
+              {agent.smartAccountAddress}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
             </a>
             <div 
               style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
@@ -413,10 +417,6 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             </div>
           </div>
         </div>
-        <div>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Allocated Capital</div>
-          <div style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>{agent.capital} WETH</div>
-        </div>
       </div>
 
       {linkCode && (
@@ -433,6 +433,65 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         onClose={() => setModalState(s => ({ ...s, isOpen: false }))} 
         title={modalState.title} 
         message={modalState.message} 
+      />
+
+      <Modal
+        isOpen={withdrawConfirmOpen}
+        onClose={() => setWithdrawConfirmOpen(false)}
+        title="Confirm Withdraw"
+        message={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <p style={{ margin: 0 }}>You are about to withdraw capital from your Fletcher Agent's Smart Account back to your main wallet.</p>
+            
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#f59e0b' }}>Important Information:</div>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
+                <li>This action will withdraw <strong>ALL IDLE WETH</strong> currently held in your Agent's Smart Account.</li>
+                <li>WETH that is currently actively deployed in LP positions will <strong>NOT</strong> be withdrawn.</li>
+                <li>You must sign a message in your wallet to authorize this action.</li>
+              </ul>
+            </div>
+
+            <button 
+              onClick={handleWithdraw}
+              disabled={loadingWithdraw}
+              style={{ padding: '12px', background: 'var(--red)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              {loadingWithdraw ? "Processing..." : "Withdraw Idle WETH"}
+            </button>
+          </div>
+        }
+      />
+
+      <Modal
+        isOpen={depositConfirmOpen}
+        onClose={() => setDepositConfirmOpen(false)}
+        title="Deposit Capital"
+        message={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <p style={{ margin: 0 }}>Enter the amount of WETH to transfer from your main wallet into the Fletcher Smart Account.</p>
+            
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontWeight: 'bold' }}>Amount:</span>
+              <input 
+                type="number" 
+                value={depositAmount} 
+                onChange={(e) => setDepositAmount(e.target.value)}
+                style={{ flex: 1, padding: '8px', background: 'rgba(0,0,0,0.3)', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', fontSize: '14px' }}
+                placeholder="Enter WETH amount"
+              />
+              <span>WETH</span>
+            </div>
+
+            <button 
+              onClick={handleDeposit}
+              disabled={loadingDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
+              style={{ padding: '12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              {loadingDeposit ? "Depositing..." : "Confirm Deposit"}
+            </button>
+          </div>
+        }
       />
     </div>
   );

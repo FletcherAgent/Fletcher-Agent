@@ -4,6 +4,13 @@ import React, { useEffect, useState } from "react";
 import { useAccount, useSendTransaction } from "wagmi";
 import { Modal } from "./Modal";
 
+const parseError = (e: any): string => {
+  const msg = e?.shortMessage || e?.message || String(e);
+  if (msg.includes('User rejected the request')) return 'Transaction was rejected by the user in their wallet.';
+  if (msg.includes('insufficient funds')) return 'Insufficient funds to complete this transaction.';
+  return msg.split('\n')[0];
+};
+
 export function PendingActionsList({ isActive = true }: { isActive?: boolean }) {
   const { address, isConnected } = useAccount();
   const { sendTransactionAsync } = useSendTransaction();
@@ -65,7 +72,7 @@ export function PendingActionsList({ isActive = true }: { isActive?: boolean }) 
       showModal("Transaction Approved", `Hash: ${txHash.slice(0, 10)}...`);
       fetchActions();
     } catch (e: any) {
-      showModal("Transaction Failed", e.message);
+      showModal("Transaction Failed", parseError(e));
     } finally {
       setLoadingId(null);
     }

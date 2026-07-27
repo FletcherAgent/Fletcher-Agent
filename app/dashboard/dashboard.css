@@ -140,3 +140,5 @@
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
