@@ -206,7 +206,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         <h3 style={{ marginBottom: '12px', fontSize: '20px' }}>Your Personal Fletcher Agent</h3>
         <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>
           Deploy your zero-custody AI agent to automate trading and liquidity provision on Robinhood Chain.
-          Requires Tier 1 (2,500,000 $FLETCH) balance.
+          Requires Tier 1 (1,000,000 $FLETCH) balance.
         </p>
         {!isEligible && (
           <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #ef4444', textAlign: 'left' }}>
@@ -240,7 +240,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
                 <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Requirements:</div>
                 <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
-                  <li>Tier 1 (2,500,000 $FLETCH) balance</li>
+                  <li>Tier 1 (1,000,000 $FLETCH) balance</li>
                   <li>Connected Web3 wallet to sign the deployment message</li>
                 </ul>
               </div>
