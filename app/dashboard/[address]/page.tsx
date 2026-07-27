@@ -100,7 +100,7 @@ export default function DashboardV2({ params }: { params: { address: string } })
       <main className="wrap">
         {/* LEFT: Agent Log */}
         <section className="col">
-          <AgentLog logs={data?.logs || []} />
+          <AgentLog logs={data?.logs || []} title="Personal Agent Log" streamLabel="USER STREAM" />
         </section>
 
         {/* MIDDLE: positions */}

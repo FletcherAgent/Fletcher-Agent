@@ -93,7 +93,7 @@ export default function DashboardV2() {
       <main className="wrap">
         {/* LEFT: Agent Log */}
         <section className="col">
-          <AgentLog logs={data?.logs || []} />
+          <AgentLog logs={data?.logs || []} title="Global Agent Log" streamLabel="PUBLIC STREAM" />
         </section>
 
         {/* MIDDLE: positions */}

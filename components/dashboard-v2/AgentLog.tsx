@@ -2,14 +2,16 @@ import React from 'react';
 
 interface AgentLogProps {
   logs: any[];
+  title?: string;
+  streamLabel?: string;
 }
 
-export function AgentLog({ logs }: AgentLogProps) {
+export function AgentLog({ logs, title = "Agent log", streamLabel = "STREAMING" }: AgentLogProps) {
   return (
     <div className="sect sect-fill">
       <div className="sect-head">
-        <h2>Agent log</h2>
-        <span className="tag live">STREAMING</span>
+        <h2>{title}</h2>
+        <span className="tag live">{streamLabel}</span>
       </div>
       <div className="log" id="log">
         {logs.length === 0 && (
