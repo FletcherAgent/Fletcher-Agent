@@ -14,6 +14,8 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [inputCapital, setInputCapital] = useState("500");
   const [copied, setCopied] = useState(false);
   const [loadingDeposit, setLoadingDeposit] = useState(false);
+  const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
+  const [loadingWithdraw, setLoadingWithdraw] = useState(false);
 
   const REQUIRED_BALANCE = 2500000;
   const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
@@ -152,6 +154,41 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
     }
   };
 
+  const handleWithdraw = async () => {
+    if (!agent) return;
+    try {
+      setWithdrawConfirmOpen(false);
+      setLoadingWithdraw(true);
+      
+      const signature = await signMessageAsync({ message: "Withdraw Fletcher Agent Capital for my address: " + address });
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+      const res = await fetch(`${apiUrl}/api/agents/withdraw`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          "x-wallet-address": address as string,
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ signature, amount: "ALL" })
+      });
+      
+      const data = await res.json();
+      if (data.error) {
+        showModal("Withdraw Failed", data.error);
+      } else {
+        showModal("Withdraw Initiated", `Your idle WETH capital has been transferred back to your wallet.\n\nTx Hash: ${data.txHash}`);
+        onRefresh();
+        refetchAgentBalance();
+      }
+    } catch (e: any) {
+      showModal("Withdraw Failed", e.message);
+    } finally {
+      setLoadingWithdraw(false);
+    }
+  };
+
   if (!agent) {
     return (
       <div className="card" style={{ marginBottom: '20px', padding: '24px', textAlign: 'center', background: 'var(--panel-bg)' }}>
@@ -230,6 +267,33 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             </div>
           }
         />
+        <Modal
+          isOpen={withdrawConfirmOpen}
+          onClose={() => setWithdrawConfirmOpen(false)}
+          title="Confirm Withdraw"
+          message={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+              <p style={{ margin: 0 }}>You are about to withdraw capital from your Fletcher Agent's Smart Account back to your main wallet.</p>
+              
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
+                <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#f59e0b' }}>Important Information:</div>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
+                  <li>This action will withdraw <strong>ALL IDLE WETH</strong> currently held in your Agent's Smart Account.</li>
+                  <li>WETH that is currently actively deployed in LP positions will <strong>NOT</strong> be withdrawn.</li>
+                  <li>You must sign a message in your wallet to authorize this action.</li>
+                </ul>
+              </div>
+
+              <button 
+                onClick={handleWithdraw}
+                disabled={loadingWithdraw}
+                style={{ padding: '12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}
+              >
+                {loadingWithdraw ? "Processing..." : "Sign & Withdraw All Idle WETH"}
+              </button>
+            </div>
+          }
+        />
       </div>
     );
   }
@@ -270,6 +334,20 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-5.67"/>
             </svg>
+          </button>
+          <button 
+            onClick={() => setWithdrawConfirmOpen(true)}
+            disabled={loadingWithdraw}
+            style={{ padding: '6px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            title="Withdraw Capital"
+          >
+            {loadingWithdraw ? (
+              <span style={{ fontSize: '12px', padding: '0 4px' }}>...</span>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+            )}
           </button>
           
           {agent.status === 'PENDING_FUNDING' && !isFunded ? (
