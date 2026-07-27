@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useReadContract } from "wagmi";
 import { Modal } from "./Modal";
 
 export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], user: any, onRefresh: () => void }) {
@@ -13,6 +13,28 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [deployConfirmOpen, setDeployConfirmOpen] = useState(false);
   const [inputCapital, setInputCapital] = useState("500");
   const [copied, setCopied] = useState(false);
+
+  const REQUIRED_BALANCE = 2500000;
+  const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
+
+  const { data: balanceData } = useReadContract({
+    address: FLETCH_CA,
+    abi: [{
+      name: 'balanceOf',
+      type: 'function',
+      stateMutability: 'view',
+      inputs: [{ name: 'account', type: 'address' }],
+      outputs: [{ type: 'uint256' }],
+    }],
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address }
+  });
+
+  // FLETCH has 18 decimals
+  const fletchBalance = balanceData ? Number(balanceData) / 1e18 : 0;
+  const isEligible = fletchBalance >= REQUIRED_BALANCE;
+  const shortfall = REQUIRED_BALANCE - fletchBalance;
 
   const showModal = (title: string, message: React.ReactNode) => {
     setModalState({ isOpen: true, title, message });
@@ -91,11 +113,17 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
           Deploy your zero-custody AI agent to automate trading and liquidity provision on Robinhood Chain.
           Requires Tier 1 (2,500,000 $FLETCH) balance.
         </p>
+        {!isEligible && (
+          <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid #ef4444', textAlign: 'left' }}>
+            <strong>Insufficient Balance:</strong> You hold {fletchBalance.toLocaleString(undefined, {maximumFractionDigits: 2})} $FLETCH. You need {(shortfall).toLocaleString(undefined, {maximumFractionDigits: 2})} more $FLETCH to reach Tier 1.
+          </div>
+        )}
+
         <button 
           className="btn-primary"
-          disabled={loading}
+          disabled={loading || !isEligible}
           onClick={() => setDeployConfirmOpen(true)}
-          style={{ padding: '12px 24px', fontSize: '16px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          style={{ padding: '12px 24px', fontSize: '16px', background: isEligible ? 'var(--green)' : '#555', color: isEligible ? '#000' : '#888', border: 'none', borderRadius: '4px', cursor: isEligible ? 'pointer' : 'not-allowed', fontWeight: 'bold' }}
         >
           {loading ? "Deploying..." : "Deploy Agent"}
         </button>
