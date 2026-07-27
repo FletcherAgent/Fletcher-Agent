@@ -36,6 +36,9 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
         if (res.ok) {
           const data = await res.json();
           setPos((p: any) => ({ ...p, feesCollected: data.feesCollected, ilRunning: data.ilRunning, status: data.status, edgeBufferPct: data.edgeBufferPct }));
+          if (data.currentTick !== undefined && data.currentTick !== null) {
+            setCurrentTick(data.currentTick);
+          }
         }
       } catch (e) {}
     };
