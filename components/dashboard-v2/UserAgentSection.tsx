@@ -132,14 +132,15 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
                 </ol>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
-                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Allocated Capital (USDC):</div>
+                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Allocated Capital (WETH):</div>
                 <input 
                   type="number" 
                   value={inputCapital}
                   onChange={(e) => setInputCapital(e.target.value)}
                   style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--line)', color: '#fff', borderRadius: '4px', fontFamily: 'var(--font-jetbrains-mono)' }}
-                  placeholder="e.g. 1000"
+                  placeholder="e.g. 1.5"
                   min="0"
+                  step="0.01"
                 />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
                   This amount will be allocated to your agent's zero-custody smart account upon deployment.
@@ -221,7 +222,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
         </div>
         <div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Allocated Capital</div>
-          <div style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>${agent.capital}</div>
+          <div style={{ fontFamily: 'var(--font-jetbrains-mono)' }}>{agent.capital} WETH</div>
         </div>
       </div>
 
