@@ -27,7 +27,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [depositAmount, setDepositAmount] = useState(agents?.[0]?.capital?.toString() || "500");
   const [depositConfirmOpen, setDepositConfirmOpen] = useState(false);
 
-  const REQUIRED_BALANCE = 2500000;
+  const REQUIRED_BALANCE = 1000000;
   const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
   const WETH_ADDRESS = (process.env.NEXT_PUBLIC_WETH_ADDRESS || '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') as `0x${string}`;
   const { writeContractAsync } = useWriteContract();
@@ -376,7 +376,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       <h4 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>Your Personal Fletcher Agent</h4>
       <p style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '14px' }}>
         Deploy your zero-custody AI agent to automate trading and liquidity provision on Robinhood Chain.
-        Requires Tier 1 (2,500,000 $FLETCH) balance.
+        Requires Tier 1 (1,000,000 $FLETCH) balance.
       </p>
 
       <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', overflow: 'hidden' }}>
