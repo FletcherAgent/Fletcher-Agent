@@ -198,7 +198,7 @@ export default function Hero() {
           Fletcher manages concentrated liquidity positions on its own: screening pairs, deploying ranges, compounding fees, and exiting when impermanent loss outruns yield. Sniping and smart-money copy-trading ride on top. You hold the keys the entire time.
         </p>
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '32px' }}>
-          <a href="/dashboard-v2" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
+          <a href="/dashboard" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>Open Dashboard</a>
           {/* <a href="https://github.com/FletcherAgent" target="_blank" rel="noopener noreferrer" className="btn-app" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: '1px solid #2bff5b', color: '#2bff5b' }}>View on Github</a> */}
         </div>
       </div>
