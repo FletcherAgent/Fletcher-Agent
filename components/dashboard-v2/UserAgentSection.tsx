@@ -234,24 +234,34 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px' }}>
         <div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>Smart Account (Zero-Custody)</div>
-          <div 
-            style={{ fontFamily: 'var(--font-jetbrains-mono)', color: 'var(--green)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-            title="Click to copy full address"
-            onClick={() => {
-              navigator.clipboard.writeText(agent.smartAccountAddress);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
-          >
-            {agent.smartAccountAddress.slice(0,6)}...{agent.smartAccountAddress.slice(-4)}
-            {copied ? (
-              <span style={{ fontSize: '10px', background: 'var(--green)', color: '#000', padding: '2px 4px', borderRadius: '4px' }}>Copied!</span>
-            ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <a 
+              href={`https://robinhoodchain.blockscout.com/address/${agent.smartAccountAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontFamily: 'var(--font-jetbrains-mono)', color: 'var(--green)', textDecoration: 'none' }}
+              title="View on Robinhood Chain Explorer"
+            >
+              {agent.smartAccountAddress.slice(0,6)}...{agent.smartAccountAddress.slice(-4)}
+            </a>
+            <div 
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="Copy Address"
+              onClick={() => {
+                navigator.clipboard.writeText(agent.smartAccountAddress);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+            >
+              {copied ? (
+                <span style={{ fontSize: '10px', background: 'var(--green)', color: '#000', padding: '2px 4px', borderRadius: '4px' }}>Copied!</span>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, color: 'var(--green)' }}>
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              )}
+            </div>
           </div>
         </div>
         <div>
