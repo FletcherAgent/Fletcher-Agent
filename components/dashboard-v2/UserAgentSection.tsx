@@ -17,7 +17,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const { signMessageAsync } = useSignMessage();
   const [loading, setLoading] = useState(false);
   const [linkCode, setLinkCode] = useState<string | null>(null);
-  const [modalState, setModalState] = useState<{isOpen: boolean, title: string, message: React.ReactNode}>({ isOpen: false, title: '', message: '' });
+  const [modalState, setModalState] = useState<{isOpen: boolean, title: string, message: React.ReactNode, onClose?: () => void}>({ isOpen: false, title: '', message: '' });
   const [deployConfirmOpen, setDeployConfirmOpen] = useState(false);
   const [inputCapital, setInputCapital] = useState("500");
   const [copied, setCopied] = useState(false);
@@ -53,8 +53,8 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const isEligible = isWhitelisted || fletchBalance >= REQUIRED_BALANCE;
   const shortfall = isWhitelisted ? 0 : REQUIRED_BALANCE - fletchBalance;
 
-  const showModal = (title: string, message: React.ReactNode) => {
-    setModalState({ isOpen: true, title, message });
+  const showModal = (title: string, message: React.ReactNode, onClose?: () => void) => {
+    setModalState({ isOpen: true, title, message, onClose });
   };
 
   const agent = agents?.[0]; // Support single agent for MVP
@@ -115,15 +115,14 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               body: JSON.stringify({ agentId: data.agent.id, txHash })
             });
 
-            showModal("Success", `Agent deployed successfully!\n\nSmart Account: ${data.agent.smartAccountAddress}\nIdentity NFT Minted: ${txHash}`);
+            showModal("Success", `Agent deployed successfully!\n\nSmart Account: ${data.agent.smartAccountAddress}\nIdentity NFT Minted: ${txHash}`, () => onRefresh());
           } catch (mintErr: any) {
             console.error("Mint failed:", mintErr);
-            showModal("Warning", `Agent deployed but NFT minting failed or was rejected.\n\nSmart Account: ${data.agent.smartAccountAddress}`);
+            showModal("Warning", `Agent deployed but NFT minting failed or was rejected.\n\nSmart Account: ${data.agent.smartAccountAddress}`, () => onRefresh());
           }
         } else {
-          showModal("Success", "Agent deployed successfully! Counterfactual address: " + data.agent.smartAccountAddress);
+          showModal("Success", "Agent deployed successfully! Counterfactual address: " + data.agent.smartAccountAddress, () => onRefresh());
         }
-        onRefresh();
       }
     } catch (e: any) {
       showModal("Deployment Failed", parseError(e));
@@ -251,7 +250,10 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
 
         <Modal 
           isOpen={modalState.isOpen} 
-          onClose={() => setModalState(s => ({ ...s, isOpen: false }))} 
+          onClose={() => {
+            setModalState(s => ({ ...s, isOpen: false }));
+            if (modalState.onClose) modalState.onClose();
+          }} 
           title={modalState.title} 
           message={modalState.message} 
         />
