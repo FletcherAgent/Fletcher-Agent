@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 
 export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: number }) {
   const [pos, setPos] = useState(initialPos);
-  const [currentTick, setCurrentTick] = useState<number | null>(null);
+  const [currentTick, setCurrentTick] = useState<number | null>(initialPos.entryTick ?? null);
+
+  const formatTinyMoney = (val: number) => {
+    if (!val) return "0.00";
+    if (Math.abs(val) > 0 && Math.abs(val) < 0.01) return val.toFixed(6);
+    return val.toFixed(2);
+  };
 
   useEffect(() => {
     // WebSocket for real-time tick updates
@@ -155,7 +161,7 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
       <div className="pos-meta" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>${pos.entryValue} deployed · opened {openedAt} · {Math.floor(daysOpen)}d ago · {feeEarnedPct.toFixed(2)}% fees</span>
         <span style={{ color: (pos.feesCollected + pos.ilRunning) >= 0 ? "var(--green)" : "var(--amber)", fontWeight: 600, fontSize: '11px' }}>
-          PNL: {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${(pos.feesCollected + pos.ilRunning).toFixed(2)}
+          PNL: {(pos.feesCollected + pos.ilRunning) >= 0 ? '+' : ''}${formatTinyMoney(pos.feesCollected + pos.ilRunning)}
         </span>
       </div>
       
@@ -202,11 +208,11 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
       <div className="bars">
 
         <div className="bar">
-          <div className="bk"><span>FEES COLLECTED</span><span>${Number(pos.feesCollected || 0).toFixed(2)}</span></div>
+          <div className="bk"><span>FEES COLLECTED</span><span>${formatTinyMoney(pos.feesCollected || 0)}</span></div>
           <div className="bt"><div className="bf" style={{ width: `${feesWidth}%` }}></div></div>
         </div>
         <div className="bar il">
-          <div className="bk"><span>IL ESTIMATE</span><span>{pos.ilRunning === 0 ? "n/a (no IL yet)" : `$${Number(pos.ilRunning || 0).toFixed(2)}`}</span></div>
+          <div className="bk"><span>IL ESTIMATE</span><span>{pos.ilRunning === 0 ? "n/a (no IL yet)" : (pos.ilRunning < 0 ? `-$${formatTinyMoney(Math.abs(pos.ilRunning))}` : `$${formatTinyMoney(pos.ilRunning)}`)}</span></div>
           <div className="bt"><div className="bf" style={{ width: `${ilWidth}%` }}></div></div>
         </div>
       </div>
