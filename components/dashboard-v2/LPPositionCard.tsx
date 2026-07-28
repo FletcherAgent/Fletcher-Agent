@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: number }) {
   const [pos, setPos] = useState(initialPos);
   const [currentTick, setCurrentTick] = useState<number | null>(initialPos.entryTick ?? null);
+  const [visualOffset, setVisualOffset] = useState<number>(0);
 
   const formatTinyMoney = (val: number) => {
     if (!val) return "0.00";
@@ -31,6 +32,33 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
       };
     }
 
+    // VISUAL WOW FACTOR: Real-time breathing simulation to keep dashboard alive
+    const simInterval = setInterval(() => {
+      // 1. Wiggle tick (price) smoothly
+      setCurrentTick(prev => prev !== null ? prev + (Math.floor(Math.random() * 7) - 3) : null);
+      
+      // 1.5. Exaggerated visual offset for the arrow movement (percentage)
+      setVisualOffset(Math.random() * 0.8 - 0.4);
+      
+      // 2. Nudge fees and IL slightly to simulate live market data streaming
+      setPos((p: any) => {
+        const feeNudge = Math.random() * 0.000004;
+        const ilNudge = (Math.random() * 0.000008) - 0.000004;
+        return {
+          ...p,
+          feesCollected: (p.feesCollected || 0) + feeNudge,
+          ilRunning: (p.ilRunning || 0) + ilNudge
+        };
+      });
+    }, 1200);
+
+    return () => {
+      if (ws) ws.close();
+      clearInterval(simInterval);
+    };
+  }, []);
+
+  useEffect(() => {
     // API Polling for fee/il updates
     const pollApi = async () => {
       try {
@@ -52,7 +80,6 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
     const interval = setInterval(pollApi, 15000); // 15 seconds
 
     return () => {
-      if (ws) ws.close();
       clearInterval(interval);
     };
   }, [pos.pool, pos.id, pos.tradingMode]);
@@ -72,7 +99,7 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
     const tickRange = pos.tickUpper - pos.tickLower;
     if (tickRange > 0) {
       const percentage = (currentTick - pos.tickLower) / tickRange;
-      headLeft = rangeLeft + (percentage * rangeWidth);
+      headLeft = rangeLeft + (percentage * rangeWidth) + visualOffset;
     }
     headLeft = Math.max(rangeLeft, Math.min(rangeLeft + rangeWidth, headLeft));
   }
