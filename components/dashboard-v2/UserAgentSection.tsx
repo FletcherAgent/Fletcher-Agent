@@ -102,10 +102,18 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             setLoading(true);
             const txHash = await writeContractAsync({
               address: data.mintInstruction.contract,
-              abi: parseAbi(['function registerIdentity(address owner, string tokenURI)']),
-              functionName: 'registerIdentity',
-              args: [address as `0x${string}`, data.mintInstruction.tokenURI]
+              abi: parseAbi(['function register(string tokenURI)']),
+              functionName: 'register',
+              args: [data.mintInstruction.tokenURI]
             });
+            
+            // Confirm with backend
+            await fetch(`${apiUrl}/api/agents/confirm-identity`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ agentId: data.agent.id, txHash })
+            });
+
             showModal("Success", `Agent deployed successfully!\n\nSmart Account: ${data.agent.smartAccountAddress}\nIdentity NFT Minted: ${txHash}`);
           } catch (mintErr: any) {
             console.error("Mint failed:", mintErr);
