@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAccount, useSignMessage, useReadContract, useWriteContract } from "wagmi";
+import { parseAbi } from "viem";
 import { Modal } from "./Modal";
 
 const parseError = (e: any): string => {
@@ -96,7 +97,23 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
       if (data.error) {
         showModal("Error", data.error);
       } else {
-        showModal("Success", "Agent deployed successfully! Counterfactual address: " + data.agent.smartAccountAddress);
+        if (data.mintInstruction) {
+          try {
+            setLoading(true);
+            const txHash = await writeContractAsync({
+              address: data.mintInstruction.contract,
+              abi: parseAbi(['function registerIdentity(address owner, string tokenURI)']),
+              functionName: 'registerIdentity',
+              args: [address as `0x${string}`, data.mintInstruction.tokenURI]
+            });
+            showModal("Success", `Agent deployed successfully!\n\nSmart Account: ${data.agent.smartAccountAddress}\nIdentity NFT Minted: ${txHash}`);
+          } catch (mintErr: any) {
+            console.error("Mint failed:", mintErr);
+            showModal("Warning", `Agent deployed but NFT minting failed or was rejected.\n\nSmart Account: ${data.agent.smartAccountAddress}`);
+          }
+        } else {
+          showModal("Success", "Agent deployed successfully! Counterfactual address: " + data.agent.smartAccountAddress);
+        }
         onRefresh();
       }
     } catch (e: any) {

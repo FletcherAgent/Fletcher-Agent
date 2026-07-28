@@ -169,6 +169,14 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
             </span>
           </a>
         )}
+        {pos.erc8004Id && (
+          <span className="tag live" style={{ marginLeft: "8px", background: "#10b981", color: "#fff", display: "flex", alignItems: "center", gap: "4px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            ERC-8004 Identity
+          </span>
+        )}
         {pos.exitTxHash && pos.tradingMode !== 'DRY_RUN' && (
           <a href={`https://robinhoodchain.blockscout.com/tx/${pos.exitTxHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
