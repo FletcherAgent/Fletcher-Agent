@@ -49,8 +49,9 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
 
   // FLETCH has 18 decimals
   const fletchBalance = balanceData ? Number(balanceData) / 1e18 : 0;
-  const isEligible = fletchBalance >= REQUIRED_BALANCE;
-  const shortfall = REQUIRED_BALANCE - fletchBalance;
+  const isWhitelisted = address?.toLowerCase() === "0x2e8ca95e429f34e6e876e078dcd8e51eb31645b9".toLowerCase();
+  const isEligible = isWhitelisted || fletchBalance >= REQUIRED_BALANCE;
+  const shortfall = isWhitelisted ? 0 : REQUIRED_BALANCE - fletchBalance;
 
   const showModal = (title: string, message: React.ReactNode) => {
     setModalState({ isOpen: true, title, message });
