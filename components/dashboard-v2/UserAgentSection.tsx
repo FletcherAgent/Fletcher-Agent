@@ -121,7 +121,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             if (!confirmRes.ok) {
               const errText = await confirmRes.text();
               console.error("Backend confirm-identity failed:", errText);
-              throw new Error(`NFT Mint berhasil, tapi backend gagal mengupdate database: ${errText}`);
+              throw new Error(`NFT Mint successful, but backend failed to update database: ${errText}`);
             }
 
             const successMessage = (
