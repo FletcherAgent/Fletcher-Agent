@@ -109,19 +109,89 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             });
             
             // Confirm with backend
-            await fetch(`${apiUrl}/api/agents/confirm-identity`, {
+            const confirmRes = await fetch(`${apiUrl}/api/agents/confirm-identity`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`
+              },
               body: JSON.stringify({ agentId: data.agent.id, txHash })
             });
 
-            showModal("Success", `Agent deployed successfully!\n\nSmart Account: ${data.agent.smartAccountAddress}\nIdentity NFT Minted: ${txHash}`, () => onRefresh());
+            if (!confirmRes.ok) {
+              const errText = await confirmRes.text();
+              console.error("Backend confirm-identity failed:", errText);
+              throw new Error(`NFT Mint berhasil, tapi backend gagal mengupdate database: ${errText}`);
+            }
+
+            const successMessage = (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--green)' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Agent Deployed Successfully!</span>
+                </div>
+                
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '4px' }}>Smart Account Address</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '14px', wordBreak: 'break-all' }}>{data.agent.smartAccountAddress}</div>
+                </div>
+
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '4px' }}>Identity NFT Mint Transaction</div>
+                  <a 
+                    href={`https://robinhoodchain.blockscout.com/tx/${txHash}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: 'monospace', fontSize: '14px', color: '#a855f7', textDecoration: 'none', wordBreak: 'break-all' }}
+                  >
+                    {txHash}
+                  </a>
+                </div>
+              </div>
+            );
+            showModal("Deployment Success", successMessage, () => onRefresh());
           } catch (mintErr: any) {
             console.error("Mint failed:", mintErr);
-            showModal("Warning", `Agent deployed but NFT minting failed or was rejected.\n\nSmart Account: ${data.agent.smartAccountAddress}`, () => onRefresh());
+            const warningMessage = (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <span style={{ fontSize: '16px', fontWeight: 'bold' }}>NFT Minting Rejected</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '14px' }}>The agent was created, but the ERC-8004 identity transaction was rejected or failed.</p>
+                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '4px' }}>Smart Account Address</div>
+                  <div style={{ fontFamily: 'monospace', fontSize: '14px', wordBreak: 'break-all' }}>{data.agent.smartAccountAddress}</div>
+                </div>
+              </div>
+            );
+            showModal("Warning", warningMessage, () => onRefresh());
           }
         } else {
-          showModal("Success", "Agent deployed successfully! Counterfactual address: " + data.agent.smartAccountAddress, () => onRefresh());
+          const successMessage = (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--green)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Agent Deployed Successfully!</span>
+              </div>
+              
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '4px' }}>Counterfactual Smart Account Address</div>
+                <div style={{ fontFamily: 'monospace', fontSize: '14px', wordBreak: 'break-all' }}>{data.agent.smartAccountAddress}</div>
+              </div>
+            </div>
+          );
+          showModal("Deployment Success", successMessage, () => onRefresh());
         }
       }
     } catch (e: any) {
