@@ -342,9 +342,15 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               </span>
             )}
             {agent.erc8004Id && (
-              <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', borderRadius: '4px', border: '1px solid #a855f7', marginLeft: '8px', cursor: 'help' }} title={`ERC-8004 Identity Tx: ${agent.identityTxHash || 'Unknown'}`}>
+              <a 
+                href={`https://robinhoodchain.blockscout.com/tx/${agent.identityTxHash}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(168, 85, 247, 0.1)', color: '#a855f7', borderRadius: '4px', border: '1px solid #a855f7', marginLeft: '8px', cursor: 'pointer', textDecoration: 'none' }} 
+                title={`View Transaction: ${agent.identityTxHash}`}
+              >
                 FLETCH-ID #{agent.erc8004Id}
-              </span>
+              </a>
             )}
           </h3>
           
