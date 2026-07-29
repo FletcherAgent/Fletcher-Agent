@@ -31,6 +31,9 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [depositAmount, setDepositAmount] = useState(agents?.[0]?.capital?.toString() || "500");
   const [depositConfirmOpen, setDepositConfirmOpen] = useState(false);
+  const [loadingX402, setLoadingX402] = useState(false);
+  const [x402Result, setX402Result] = useState<string | null>(null);
+  const [x402PaymentReq, setX402PaymentReq] = useState<{token: string, amount: string, recipient: string} | null>(null);
 
   const REQUIRED_BALANCE = 1000000;
   const FLETCH_CA = process.env.NEXT_PUBLIC_CA as `0x${string}`;
@@ -397,6 +400,66 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
     }
   };
 
+  const handleTestX402 = async (paymentTxHash?: string) => {
+    if (!agent) return;
+    try {
+      setLoadingX402(true);
+      setX402Result(null);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      
+      const payload: any = { agentId: agent.id, taskParams: { target: 'Market Analysis' } };
+      if (paymentTxHash) payload.paymentTxHash = paymentTxHash;
+      
+      const res = await fetch(`${apiUrl}/api/agents/x402/task`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      
+      if (res.status === 402) {
+        // Payment required
+        setX402PaymentReq(data.requiredPayment);
+      } else if (res.status === 200) {
+        setX402PaymentReq(null);
+        setX402Result(data.result);
+      } else {
+        showModal("x402 Error", data.error || 'Failed to process request');
+      }
+    } catch (e: any) {
+      showModal("x402 Failed", parseError(e));
+    } finally {
+      setLoadingX402(false);
+    }
+  };
+
+  const executeX402Payment = async () => {
+    if (!x402PaymentReq) return;
+    try {
+      setLoadingX402(true);
+      const tx = await writeContractAsync({
+        address: x402PaymentReq.token as `0x${string}`,
+        abi: [{
+          name: 'transfer',
+          type: 'function',
+          stateMutability: 'nonpayable',
+          inputs: [{ name: 'recipient', type: 'address' }, { name: 'amount', type: 'uint256' }],
+          outputs: [{ type: 'bool' }]
+        }],
+        functionName: 'transfer',
+        args: [x402PaymentReq.recipient as `0x${string}`, BigInt(x402PaymentReq.amount) * BigInt("1000000000000000000")]
+      });
+      
+      // Submit the txHash to retry the request
+      await handleTestX402(tx);
+    } catch(e: any) {
+      showModal("Payment Failed", parseError(e));
+    } finally {
+      setLoadingX402(false);
+    }
+  };
+
   if (!agent) {
     return (
       <div className="card" style={{ marginBottom: '20px', padding: '24px', textAlign: 'center', background: 'var(--panel-bg)' }}>
@@ -611,6 +674,51 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             >
               {loadingSessionKey ? "Processing..." : "Revoke Session Key"}
             </button>
+          )}
+        </div>
+      </div>
+
+      <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+        <h4 style={{ marginBottom: '12px', color: 'var(--green)' }}>Agent Services (x402)</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {!x402PaymentReq && !x402Result && (
+            <button 
+              onClick={() => handleTestX402()}
+              disabled={loadingX402}
+              style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', cursor: 'pointer', maxWidth: '200px' }}
+            >
+              {loadingX402 ? "Processing..." : "Request Market Analysis"}
+            </button>
+          )}
+
+          {x402PaymentReq && (
+            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b', padding: '12px', borderRadius: '4px' }}>
+              <div style={{ color: '#f59e0b', fontWeight: 'bold', marginBottom: '8px' }}>402 Payment Required</div>
+              <div style={{ marginBottom: '12px', fontSize: '14px' }}>
+                This agent requires a payment of <strong>{x402PaymentReq.amount} $FLETCH</strong> to perform this task. 
+                <br/>The fee is dynamically calculated based on the agent's current reputation.
+              </div>
+              <button 
+                onClick={executeX402Payment}
+                disabled={loadingX402}
+                style={{ padding: '8px 16px', background: '#f59e0b', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                {loadingX402 ? "Paying..." : `Pay ${x402PaymentReq.amount} $FLETCH`}
+              </button>
+            </div>
+          )}
+
+          {x402Result && (
+            <div style={{ background: 'rgba(43,255,91,0.1)', border: '1px solid var(--green)', padding: '12px', borderRadius: '4px' }}>
+              <div style={{ color: 'var(--green)', fontWeight: 'bold', marginBottom: '8px' }}>Task Completed</div>
+              <div style={{ fontSize: '14px' }}>{x402Result}</div>
+              <button 
+                onClick={() => { setX402Result(null); }}
+                style={{ marginTop: '12px', padding: '4px 8px', background: 'transparent', color: '#fff', border: '1px solid var(--line)', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+              >
+                Clear
+              </button>
+            </div>
           )}
         </div>
       </div>
