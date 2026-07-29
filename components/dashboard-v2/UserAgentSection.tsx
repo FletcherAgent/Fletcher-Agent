@@ -565,7 +565,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               <line x1="16" y1="16" x2="16.01" y2="16"></line>
             </svg>
             {agent.name}
-            {(agent.status === 'PENDING_FUNDING' || agent.status === 'ACTIVE') && !isFunded ? (
+            {agent.status === 'PENDING_FUNDING' && !isFunded ? (
               <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
                 PENDING FUNDING
               </span>
