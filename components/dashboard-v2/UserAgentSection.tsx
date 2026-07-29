@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAccount, useSignMessage, useReadContract, useWriteContract } from "wagmi";
 import { parseAbi } from "viem";
 import { Modal } from "./Modal";
@@ -24,6 +24,10 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   const [loadingDeposit, setLoadingDeposit] = useState(false);
   const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
   const [loadingWithdraw, setLoadingWithdraw] = useState(false);
+  const [sessionKeyConfirmOpen, setSessionKeyConfirmOpen] = useState(false);
+  const [revokeConfirmOpen, setRevokeConfirmOpen] = useState(false);
+  const [loadingSessionKey, setLoadingSessionKey] = useState(false);
+  const [reputationData, setReputationData] = useState<{score: number, winRate: number, totalPositions: number, totalProfitUsd: string, onChain: boolean} | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [depositAmount, setDepositAmount] = useState(agents?.[0]?.capital?.toString() || "500");
   const [depositConfirmOpen, setDepositConfirmOpen] = useState(false);
@@ -74,6 +78,26 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
   });
 
   const isFunded = agentWethBalance ? (agentWethBalance as bigint) > BigInt(0) : false;
+
+  useEffect(() => {
+    const fetchReputation = async () => {
+      if (!agent?.erc8004Id && !agent?.id) return;
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${apiUrl}/api/agents/reputation?agentId=${agent.id}`);
+        const data = await res.json();
+        if (!data.error) {
+          setReputationData(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reputation data", err);
+      }
+    };
+    
+    if (agent && agent.status !== 'PENDING_IDENTITY') {
+      fetchReputation();
+    }
+  }, [agent?.id, agent?.erc8004Id, agent?.status, isRefreshing]);
 
   const handleDeployAgent = async () => {
     try {
@@ -295,6 +319,84 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
     }
   };
 
+  const handleGrantSessionKey = async () => {
+    try {
+      setSessionKeyConfirmOpen(false);
+      setLoadingSessionKey(true);
+      
+      const signature = await signMessageAsync({ message: "Grant FULL Session Key for my agent: " + address });
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+      const res = await fetch(`${apiUrl}/api/agents/grant-session-key`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          "x-wallet-address": address as string,
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ signature })
+      });
+      
+      const data = await res.json();
+      if (data.error) {
+        showModal("Error", data.error);
+      } else {
+        const successMessage = (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--green)' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Session Key Granted!</span>
+            </div>
+            <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>
+              Your agent is now running in <strong>FULL Autonomy</strong> mode. It will manage liquidity without requiring your manual approval.
+            </p>
+          </div>
+        );
+        showModal("FULL Mode Enabled", successMessage, () => onRefresh());
+      }
+    } catch (e: any) {
+      showModal("Action Failed", parseError(e));
+    } finally {
+      setLoadingSessionKey(false);
+    }
+  };
+
+  const handleRevokeSessionKey = async () => {
+    try {
+      setRevokeConfirmOpen(false);
+      setLoadingSessionKey(true);
+      
+      const signature = await signMessageAsync({ message: "Revoke FULL Session Key for my agent: " + address });
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
+      const res = await fetch(`${apiUrl}/api/agents/revoke-session-key`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          "x-wallet-address": address as string,
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({ signature })
+      });
+      
+      const data = await res.json();
+      if (data.error) {
+        showModal("Error", data.error);
+      } else {
+        showModal("Session Key Revoked", "Your agent has been reverted to SEMI mode. It will require your manual approval for all actions.", () => onRefresh());
+      }
+    } catch (e: any) {
+      showModal("Action Failed", parseError(e));
+    } finally {
+      setLoadingSessionKey(false);
+    }
+  };
+
   if (!agent) {
     return (
       <div className="card" style={{ marginBottom: '20px', padding: '24px', textAlign: 'center', background: 'var(--panel-bg)' }}>
@@ -400,7 +502,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               <line x1="16" y1="16" x2="16.01" y2="16"></line>
             </svg>
             {agent.name}
-            {agent.status === 'PENDING_FUNDING' && !isFunded ? (
+            {(agent.status === 'PENDING_FUNDING' || agent.status === 'ACTIVE') && !isFunded ? (
               <span style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', borderRadius: '4px', border: '1px solid #f59e0b', marginLeft: '8px' }}>
                 PENDING FUNDING
               </span>
@@ -423,6 +525,17 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               >
                 FLETCH-ID #{agent.erc8004Id}
               </a>
+            )}
+            {reputationData && (
+              <span 
+                style={{ fontSize: '12px', padding: '2px 6px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '4px', border: '1px solid #3b82f6', marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }} 
+                title={`Win Rate: ${reputationData.winRate}% | Total Positions: ${reputationData.totalPositions} | PNL: $${reputationData.totalProfitUsd}`}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                Reputation: {reputationData.score}
+              </span>
             )}
           </h3>
           
@@ -457,7 +570,7 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             )}
           </button>
           
-          {agent.status === 'PENDING_FUNDING' && !isFunded && (
+          {(agent.status === 'PENDING_FUNDING' || agent.status === 'ACTIVE') && (
             <button 
               onClick={() => setDepositConfirmOpen(true)}
               style={{ padding: '6px 12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
@@ -478,6 +591,26 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0088cc', fontWeight: 'bold', fontSize: '14px' }}>
               ✓ Linked to @{user.telegramUsername}
             </div>
+          )}
+
+          {agent.status === 'ACTIVE' && agent.mode !== 'FULL' && (
+            <button 
+              onClick={() => setSessionKeyConfirmOpen(true)}
+              disabled={loadingSessionKey}
+              style={{ padding: '6px 12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
+            >
+              {loadingSessionKey ? "Processing..." : "Enable FULL Autonomy"}
+            </button>
+          )}
+
+          {agent.status === 'ACTIVE' && agent.mode === 'FULL' && (
+            <button 
+              onClick={() => setRevokeConfirmOpen(true)}
+              disabled={loadingSessionKey}
+              style={{ padding: '6px 12px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}
+            >
+              {loadingSessionKey ? "Processing..." : "Revoke Session Key"}
+            </button>
           )}
         </div>
       </div>
@@ -598,6 +731,62 @@ export function UserAgentSection({ agents, user, onRefresh }: { agents: any[], u
               style={{ padding: '12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             >
               {loadingDeposit ? "Depositing..." : "Confirm Deposit"}
+            </button>
+          </div>
+        }
+      />
+
+      <Modal
+        isOpen={sessionKeyConfirmOpen}
+        onClose={() => setSessionKeyConfirmOpen(false)}
+        title="Enable FULL Autonomy (Session Key)"
+        message={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <p style={{ margin: 0 }}>You are about to grant a <strong>Session Key</strong> to your agent, enabling <strong>FULL Autonomy</strong> mode.</p>
+            
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold', color: 'var(--green)' }}>What this means:</div>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
+                <li>Your agent will execute rebalancing and LP actions automatically without requiring your approval.</li>
+                <li>The session key is strictly scoped to Uniswap V3 LP operations (Zero-Custody).</li>
+                <li>Your idle WETH capital remains completely secure in your Smart Account.</li>
+                <li>You can revoke this session key and return to SEMI mode at any time.</li>
+              </ul>
+            </div>
+
+            <button 
+              onClick={handleGrantSessionKey}
+              disabled={loadingSessionKey}
+              style={{ padding: '12px', background: 'var(--green)', color: '#000', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              {loadingSessionKey ? "Processing..." : "Sign to Grant Session Key"}
+            </button>
+          </div>
+        }
+      />
+
+      <Modal
+        isOpen={revokeConfirmOpen}
+        onClose={() => setRevokeConfirmOpen(false)}
+        title="Revoke Session Key"
+        message={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+            <p style={{ margin: 0 }}>You are about to revoke the Session Key and return your agent to <strong>SEMI Mode</strong>.</p>
+            
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#f59e0b' }}>What this means:</div>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--text-muted)' }}>
+                <li>Your agent will no longer execute trades automatically.</li>
+                <li>Every LP action (open/close) will require your manual approval via Telegram or Dashboard.</li>
+              </ul>
+            </div>
+
+            <button 
+              onClick={handleRevokeSessionKey}
+              disabled={loadingSessionKey}
+              style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              {loadingSessionKey ? "Processing..." : "Sign to Revoke Session Key"}
             </button>
           </div>
         }
