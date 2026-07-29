@@ -35,6 +35,11 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
               <div className="pos-top">
                 <span className="pair">{pair}</span>
                 <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[LP]</span>
+                {pos.agent && (
+                  <span className="tag" style={{ marginLeft: "4px", background: "#0088cc", color: "#fff" }}>
+                    AGENT: {pos.agent.name.toUpperCase()}
+                  </span>
+                )}
                 {pos.source === 'ALPHA' && (
                   <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
                     [ALPHA]
@@ -133,6 +138,11 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
             <div className="pos-top">
               <span className="pair">{pos.tokenSymbol || 'TKN'}</span>
               <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[SPOT]</span>
+              {pos.agent && (
+                <span className="tag" style={{ marginLeft: "4px", background: "#0088cc", color: "#fff" }}>
+                  AGENT: {pos.agent.name.toUpperCase()}
+                </span>
+              )}
               <span className={`mode-b day`}>
                 {pos.tradingMode}
               </span>

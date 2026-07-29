@@ -31,6 +31,11 @@ export function PositionCard({ positions }: { positions: any[] }) {
             <div className="pos-top">
               <span className="pair">{pos.tokenSymbol || 'TKN'}</span>
               <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[SPOT]</span>
+              {pos.agent && (
+                <span className="tag" style={{ marginLeft: "4px", background: "#0088cc", color: "#fff" }}>
+                  AGENT: {pos.agent.name.toUpperCase()}
+                </span>
+              )}
               <span className={`mode-b day`}>
                 {pos.tradingMode}
               </span>

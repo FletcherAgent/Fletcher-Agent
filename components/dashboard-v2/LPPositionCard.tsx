@@ -146,6 +146,11 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
       <div className="pos-top">
         <span className="pair">{pair}</span>
         <span className="tag" style={{ marginLeft: "8px", background: "#444", color: "#fff" }}>[LP]</span>
+        {pos.agent && (
+          <span className="tag" style={{ marginLeft: "4px", background: "#0088cc", color: "#fff" }}>
+            AGENT: {pos.agent.name.toUpperCase()}
+          </span>
+        )}
         <span className={`mode-b ${isNight ? 'night' : 'day'}`}>
           {isNight ? 'NIGHT · SPRAY' : 'DAY · FULL RANGE'}
         </span>
