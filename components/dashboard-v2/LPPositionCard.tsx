@@ -157,11 +157,11 @@ export function LPPositionCard({ initialPos, idx }: { initialPos: any, idx: numb
         <span className="tag" style={{ marginLeft: "8px", background: "#333", color: "#ddd" }}>
           v3 · {pos.feeTier / 10000}%
         </span>
-        {pos.source === 'ALPHA' && (
+        {/* {pos.source === 'ALPHA' && (
           <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
             [ALPHA]
           </span>
-        )}
+        )} */}
         {pos.txHash && pos.tradingMode !== 'DRY_RUN' && (
           <a href={`https://robinhoodchain.blockscout.com/tx/${pos.txHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

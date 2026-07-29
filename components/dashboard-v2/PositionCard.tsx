@@ -39,11 +39,11 @@ export function PositionCard({ positions }: { positions: any[] }) {
               <span className={`mode-b day`}>
                 {pos.tradingMode}
               </span>
-              {pos.source === 'ALPHA' && (
+              {/* {pos.source === 'ALPHA' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
                   [ALPHA]
                 </span>
-              )}
+              )} */}
               {pos.source === 'COPYTRADE' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#2563EB", color: "#fff" }}>
                   [COPY]

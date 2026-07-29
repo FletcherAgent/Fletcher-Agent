@@ -40,11 +40,11 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
                     AGENT: {pos.agent.name.toUpperCase()}
                   </span>
                 )}
-                {pos.source === 'ALPHA' && (
+                {/* {pos.source === 'ALPHA' && (
                   <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
                     [ALPHA]
                   </span>
-                )}
+                )} */}
                 {pos.txHash && pos.tradingMode !== 'DRY_RUN' && (
                   <a href={`https://robinhoodchain.blockscout.com/tx/${pos.txHash}`} target="_blank" rel="noreferrer" className="tag live" style={{ marginLeft: "8px", background: "#333", color: "#ddd", textDecoration: "none" }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -146,11 +146,11 @@ export function SpotPositionCard({ positions }: { positions: any[] }) {
               <span className={`mode-b day`}>
                 {pos.tradingMode}
               </span>
-              {pos.source === 'ALPHA' && (
+              {/* {pos.source === 'ALPHA' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#7D52F4", color: "#fff" }}>
                   [ALPHA]
                 </span>
-              )}
+              )} */}
               {pos.source === 'COPYTRADE' && (
                 <span className="tag live" style={{ marginLeft: "8px", background: "#2563EB", color: "#fff" }}>
                   [COPY]
